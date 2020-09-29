@@ -1,0 +1,35 @@
+#	LINK COMMAND FILE FOR VU-METER PROGRAM
+#	Copyright (c) 2000 by COSMIC Software
+#
++seg .text -b 0x1000 -n .text		# program start address
++seg .const -a .text			# constants follow code
++seg .bsct -b 0x80 -m 0x40		# data start address
++seg .ubsct -n iram			# uninitialized zero page
+
+# define the .share segment when using compact or memory models only
++seg .share -a iram -n share -is	# shared segment
+
+# Put you startup file here
+crts.o
+
+# Put your files here
+lsm6aprs.o
+adc.o
+init.o
+interrupt.o
+stdio.o
+tasks.o
+
+# float and integer library names depend on the model used
+"C:\Program Files (x86)\COSMIC\EVAL_ST7\Lib\libim.st7"
+"C:\Program Files (x86)\COSMIC\EVAL_ST7\Lib\libm.st7"
+
+# Put your interrupt vectors file here if needed
++seg .const -b 0xffe4			# vectors start address
+vector.o
+
+#
+# define these symbols if crtsi or crtsx is used
+#
++def __endzp=@.ubsct			# end of uninitialized zpage
++def __memory=@.bss			# end of bss segment

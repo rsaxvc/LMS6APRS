@@ -1,0 +1,10 @@
+*.o
+*.st7
+*.elf
+*.ls
+*.swp
+*.la
+*.map
+*.sbr
+IDEA.ERR
+IDEABLD.BAT

@@ -1,0 +1,20 @@
+-Toolchain-
+We're using COSMIC ST7's toolchain.
+It's pretty old.
+Quite a bit of contemporary C isn't supported.
+There didn't seem to be an open-source toolchain.
+
+-Configuring COSMIC IDE-
+Project->Load(lsm6aprs.prj)
+Project->WorkingDirectory(this directory)
+Build->Build
+
+-Assembly writers-
+We're using the COSMIC ST7 ABI.
+The first C arg is passed in register x.
+The second C arg in register a.
+Who would ever want more than three registers anyways?
+
+-Adding a file to the build-
+Please add new C files to both Build.bat and lsm6aprs.prj(the IDE control file).
+
