@@ -17,7 +17,7 @@ lsm6aprs.o
 adc.o
 init.o
 interrupt.o
-stdio.o
+putchar.o
 tasks.o
 
 # float and integer library names depend on the model used

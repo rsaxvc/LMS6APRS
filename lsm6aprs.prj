@@ -75,8 +75,8 @@ Cmd=
 Exec=NO
 Cmd=
 [Files]
-1=tasks.c
-2=stdio.c
+1=putchar.s
+2=tasks.c
 3=adc.c
 4=crts.s
 5=interrupt.c
@@ -84,11 +84,11 @@ Cmd=
 7=vector.c
 8=lsm6aprs.c
 [FILE1OPTS]
-FileName=tasks.c
-TOOL=cxst7
+FileName=putchar.s
+TOOL=cast7
 DefsChanged=0
 [FILE2OPTS]
-FileName=stdio.c
+FileName=tasks.c
 TOOL=cxst7
 DefsChanged=0
 [FILE3OPTS]
