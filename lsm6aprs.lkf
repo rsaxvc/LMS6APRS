@@ -1,7 +1,7 @@
 #	LINK COMMAND FILE FOR VU-METER PROGRAM
 #	Copyright (c) 2000 by COSMIC Software
 #
-+seg .text -b 0x1000 -n .text		# program start address
++seg .text -b 0x8000 -n .text		# program start address
 +seg .const -a .text			# constants follow code
 +seg .bsct -b 0x80 -m 0x40		# data start address
 +seg .ubsct -n iram			# uninitialized zero page
