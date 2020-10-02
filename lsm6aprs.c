@@ -19,6 +19,7 @@ tasks |= new_tasks;
 
 void main(void)
 	{
+	tasks = 0;
 	port_init();
 	timer_init();
 	puts("APRS Tracker\r\n");
@@ -28,28 +29,21 @@ void main(void)
 
 	for (;;)
 		{
+		unsigned char new_tasks;
+		
 		SIM();
-		if( tasks & TASK_A )
+		new_tasks = tasks;
+		tasks = 0;
+		RIM();
+		
+		if( new_tasks & TASK_A )
 			{
-			tasks &= ~TASK_A;
-			RIM();
 			task_a();
 			}
-		else
-			{
-			RIM();
-			}
 
-		SIM();
-		if( tasks & TASK_B )
+		if( new_tasks & TASK_B )
 			{
-			tasks &= ~TASK_B;
-			RIM();
 			task_b();
-			}
-		else
-			{
-			RIM();
 			}
 
 		SIM();
