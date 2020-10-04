@@ -1,7 +1,7 @@
 /*	Example Interrupt Handlers
  *	Copyright (c) 2020 by SECKC Software
  */
-#include <io7flit0.h>
+#include <io72324.h>
 #include "interrupt.h"
 /*
 @interrupt void it_example(void)

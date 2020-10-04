@@ -6,6 +6,7 @@
 ;value: dc.b 1 ; fills .data section
 
 xdef	_putchar
+xdef	_squarewave
 ;
 ;	putc routine to bit-bang an 8N1 software UART
 ;
@@ -92,9 +93,8 @@ sendStopBit: macro ;ARGS: BankRegister, BankPin
 
 	switch	.text
 
+;TX a bit-banged UART byte at FCPU/16
 _putchar:
-
-;	ld           value,a                   ;Load first COSMIC-C parameter into accumulator(it's passed in x)
 	sim                                    ;Disable interrupts while we transmit a byte, this is why baud should be as high as possible
 	sendStartBit PORT_REG, PIN             ;Drop GPIO low to send start bit
 	sendBit      PORT_REG, PIN, 0x01       ;Send Bit0
@@ -108,5 +108,15 @@ _putchar:
 	sendStopBit  PORT_REG, PIN             ;Raise GPIO high to send end bit
 	rim                                    ;Restore interrupts
 	ret
+
+;TX a square-wave for debugging at 1MHz
+_squarewave:
+	sim
+_squarewavehigh:
+	bset         PORT_REG, #PIN
+	jra          _squarewavelow
+_squarewavelow:
+	bres         PORT_REG, #PIN
+	jra          _squarewavehigh
 
 	end

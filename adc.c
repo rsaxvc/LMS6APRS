@@ -1,7 +1,7 @@
 /*	Example of ADC read
  *	Copyright (c) 2000 by COSMIC Software
  */
-#include <io7flit0.h>
+#include <io72324.h>
 
 #define ADON	0x20	// AD Converter On
 #define COCO	0x80	// Conversion Complete
@@ -13,6 +13,6 @@ unsigned char read_adc(void)
 	ADCCSR = ADON | 3;		// enable input from PB3 
 	while (!(ADCCSR & COCO))	// wait for conversion completed
 		;
-	return (ADCDAT);		// return value
+	return (ADCDRH);		// return value
 	}
 

@@ -1,11 +1,8 @@
-#	LINK COMMAND FILE FOR VU-METER PROGRAM
-#	Copyright (c) 2000 by COSMIC Software
-#
 +seg .text -b 0x8000 -n .text		# program start address
 +seg .const -a .text			# constants follow code
-+seg .bsct -b 0x80 -m 0x40		# data start address
++seg .bsct -b 0x80 -m 0x80		# data start address
 +seg .ubsct -n iram			# uninitialized zero page
-
++seg .data -b 0x200
 # define the .share segment when using compact or memory models only
 +seg .share -a iram -n share -is	# shared segment
 
@@ -15,10 +12,14 @@ crts.o
 # Put your files here
 lsm6aprs.o
 adc.o
+cc1050.o
+delay.o
 init.o
 interrupt.o
 putchar.o
+spilib.o
 tasks.o
+tsip_parser\tsip_parser.o
 
 # float and integer library names depend on the model used
 "C:\Program Files (x86)\COSMIC\EVAL_ST7\Lib\libim.st7"
