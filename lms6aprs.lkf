@@ -13,6 +13,7 @@ crts.o
 adc.o
 cc1050.o
 delay.o
+gps.o
 init.o
 interrupt.o
 lms6aprs.o

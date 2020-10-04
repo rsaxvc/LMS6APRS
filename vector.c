@@ -10,12 +10,13 @@
  */
 
 #include "interrupt.h"
+#include "gps.h"
 extern void _stext(); /*Reset/startup entry point*/
 #define UNUSED	bad_interrupt /* map unhandled interrupts to a loop for debugging*/
 
 void (* const _vectab[])() = {
 	UNUSED,			/* AVD     */
-	UNUSED,			/* SCI     */
+	GPS_interrupt,	/* SCI     */
 	UNUSED,			/* Timer B */
 	UNUSED,			/* Timer A */
 	UNUSED,			/* SPI     */

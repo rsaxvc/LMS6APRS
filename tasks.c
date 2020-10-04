@@ -15,3 +15,8 @@ void task_b( void )
 puts("TaskB\r\n");
 pend_task( TASK_A );
 }
+
+void task_gps( void )
+{
+puts("TaskGPS\r\n");
+}

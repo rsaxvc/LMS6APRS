@@ -17,23 +17,21 @@
  */
 static unsigned char tasks;
 
+/*This is used from the main loop and tasks*/
 void pend_task( unsigned char new_tasks)
+{
+SIM();
+tasks |= new_tasks;
+RIM();
+}
+
+/*This is used from inside an interrupt handler*/
+void pend_task_irq( unsigned char new_tasks)
 {
 tasks |= new_tasks;
 }
 
 static const char example_packet[] = { 0x10, 0x01, 'H','E','L','L','O',0,0x10,0x03 };
-
-void tsip_process_packet( unsigned char id, const unsigned char * ptr, unsigned char len)
-{
-puts("GOT TSIP PACKET:");
-while(len)
-	{
-	puts_hex_u8( *ptr++ );
-	len--;
-	}
-puts("\r\n");
-}
 
 void main(void)
 	{
@@ -47,10 +45,6 @@ void main(void)
 	
 	puts("APRS Tracker\r\n");
 	puts("By SecKC\r\n");
-	for( i = 0; i < sizeof(example_packet); ++i )
-		{
-		tsip_parser_push( example_packet[i] );
-		}
 
 	CC1050_init( 0x3c, 0x64, 0x30 );
 	CC1050_tx_enable();
@@ -80,6 +74,11 @@ void main(void)
 		if( new_tasks & TASK_B )
 			{
 			task_b();
+			}
+		
+		if( new_tasks & TASK_GPS )
+			{
+			task_gps();
 			}
 
 		SIM();
