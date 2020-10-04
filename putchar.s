@@ -113,10 +113,10 @@ _putchar:
 _squarewave:
 	sim
 _squarewavehigh:
-	bset         PORT_REG, #PIN
-	jra          _squarewavelow
+	bset         PORT_REG, #PIN ;5 cycles
+	jra          _squarewavelow ;3 cycles
 _squarewavelow:
-	bres         PORT_REG, #PIN
-	jra          _squarewavehigh
+	bres         PORT_REG, #PIN ;5 cycles
+	jra          _squarewavehigh;3 cycles
 
 	end
