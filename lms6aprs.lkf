@@ -20,6 +20,7 @@ putchar.o
 puts.o
 spilib.o
 tasks.o
+tsip_parser\tsip_conversions.o
 tsip_parser\tsip_parser.o
 
 # float and integer library names depend on the model used
