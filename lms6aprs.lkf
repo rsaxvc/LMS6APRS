@@ -17,6 +17,7 @@ init.o
 interrupt.o
 lms6aprs.o
 putchar.o
+puts.o
 spilib.o
 tasks.o
 tsip_parser\tsip_parser.o

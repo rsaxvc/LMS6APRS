@@ -5,6 +5,9 @@
  *	transmits reports over APRS over AX.25
  */
 
+#include <stdio.h>
+#include "stdio2.h"
+
 #include "asmtools.h"
 #include "tasks.h"
 #include "spilib.h"
@@ -24,7 +27,12 @@ static const char example_packet[] = { 0x10, 0x01, 'H','E','L','L','O',0,0x10,0x
 void tsip_process_packet( unsigned char id, const unsigned char * ptr, unsigned char len)
 {
 puts("GOT TSIP PACKET:");
-puts(example_packet);
+while(len)
+	{
+	puts_hex_u8( *ptr++ );
+	len--;
+	}
+puts("\r\n");
 }
 
 void main(void)
@@ -41,9 +49,9 @@ void main(void)
 	puts("By SecKC\r\n");
 	for( i = 0; i < sizeof(example_packet); ++i )
 		{
-		tsip_parser_push( example_packet[0] );
+		tsip_parser_push( example_packet[i] );
 		}
-		
+
 	CC1050_init( 0x3c, 0x64, 0x30 );
 	CC1050_tx_enable();
 	while(1)
