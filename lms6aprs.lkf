@@ -10,12 +10,12 @@
 crts.o
 
 # Put your files here
-lsm6aprs.o
 adc.o
 cc1050.o
 delay.o
 init.o
 interrupt.o
+lms6aprs.o
 putchar.o
 spilib.o
 tasks.o
