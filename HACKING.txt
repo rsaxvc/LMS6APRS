@@ -3,6 +3,21 @@ We're using COSMIC ST7's toolchain.
 It's pretty old.
 Quite a bit of contemporary C isn't supported.
 There didn't seem to be an open-source toolchain.
+Also, double-precision floating point is implemented
+as single-precision.
+
+-Endianness-
+Since this is an 8bit CPU, endianness is largely a
+toolchain / software problem. The ST7 compiler appears
+to represent both multibyte integers and floats as big-endian.
+
+-Types-
+char - 8 bits
+int - 16 bits
+long - 32 bits
+long long - does not exist
+float - 32 bits
+double - 32 bits
 
 -Configuring COSMIC IDE-
 Project->Load(lsm6aprs.prj)
