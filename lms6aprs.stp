@@ -1,0 +1,31 @@
+[Last Settings]
+PROTOCOL=ICP OPT Enable
+DEVICE=ST72F324x6
+Hardware=RLINK
+Port=USB
+CpuFreq=
+Blank check before programming (when available)=1
+Verify after programming=1
+Clear memory before loading a file=1
+Erase device memory before programming (when available)=1
+Display a popup window when an error occurs=1
+Log activity=0
+Log file=
+Unlock protection before a programming cycle=0
+Prompt for new programming cycle=0
+Activate secure mode on next project loading=0
+Enable Serial=0
+Start addr=0
+Length=0
+High Base=0
+Low Base=0
+Step=0
+Little Endian=0
+[OPTION BYTE]
+Count=0
+[PROGRAM MEMORY]
+Count=1
+File0=C:\Users\rsaxvc\Documents\COSMIC\LMS6APRS\lms6aprs.s19
+Sector 2=1
+Sector 1=1
+Sector 0=1
