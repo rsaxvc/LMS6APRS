@@ -9,5 +9,5 @@ void GPS_interrupt(void);
 
 extern float gps_lla_packet[5]; /*Only valid for TASK_GPS_FIX */
 extern unsigned char gps_pkt_id; /* Only valid for TASK_GPS_PKT */
-
+extern unsigned char gps_pkt_super; /* Only valid for TASK_GPS_PKT == superpacket*/
 #endif

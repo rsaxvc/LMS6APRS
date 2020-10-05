@@ -51,11 +51,17 @@ SCICR2 = SCICR2_RIE_MASK|SCICR2_TE_MASK|SCICR2_RE_MASK;
 SCIBRR = 0xC0; //BaudRateDivider=13, so BaudRate = FCPU/16/13 = 38400 baud
 }
 
-/*queue a byte for TX, don't wait for it to go out*/
+static void print_sci_registers( void )
+{
+puts("SCISR:");puts_hex_u8(SCISR);puts("\r\n");
+puts("SCICR1:");puts_hex_u8(SCICR1);puts("\r\n");
+puts("SCICR2:");puts_hex_u8(SCICR2);puts("\r\n");
+}
+
 static void uart_tx( unsigned char byte )
 {
 //Wait for TX empty
-while( (SCISR & SCISR_TDRE_MASK)==0 );
+while( (SCISR & SCISR_TDRE_MASK) );
 
 //Load the shift register
 SCIDR = byte;
@@ -83,12 +89,11 @@ uart_tx( 0x10 );uart_tx( 0x03 );//End of frame
 
 float gps_lla_packet[5];
 unsigned char gps_pkt_id;
-
+unsigned char gps_pkt_super;
 void tsip_process_packet( unsigned char id, const unsigned char * ptr, unsigned char len)
 {
 unsigned char new_tasks = TASK_GPS_PKT;
 gps_pkt_id = id;
-
 switch( id ) 
 	{
 	case TSIP_PACKET_LLA_FLOAT:
@@ -98,21 +103,42 @@ switch( id )
 			new_tasks |= TASK_ID_GPS_FIX;
 			}
 		break;
+	case TSIP_PACKET_SUPER:
+		gps_pkt_super = ptr[0];
+		break;
 	}
 pend_task_irq( new_tasks );
 }
 
-void GPS_init(void)
+unsigned char config_done;
+void GPS_configure(void)
 {
 static const unsigned char config_packet[] = { 0x35, 0x02, 0x00, 0x01 };
+if( !config_done )
+	{
+	puts("Preparing to configure GPS\r\n");
+	tsip_tx( sizeof(config_packet), config_packet );
+	puts("GPS config done\r\n");
+	config_done = 1;
+	}
+}
+
+void GPS_init(void)
+{
+config_done = 0;
+puts("GPS_init called\r\n");
+tsip_parser_reset();
+puts("parser reset\r\n");
 uart_init();
-tsip_tx( sizeof(config_packet), config_packet );
+puts("UART init complete\r\n");
+puts("Done with GPS_init\r\n");
 }
 
 /*Handle GPS UART interrupts*/
 @interrupt void GPS_interrupt(void)
 {
-if( SCISR & SCISR_RDRF_MASK )
+unsigned char scisr = SCISR;
+if( scisr & SCISR_RDRF_MASK )
 	{
 	tsip_parser_push( SCIDR );
 	}

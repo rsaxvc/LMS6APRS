@@ -42,6 +42,7 @@ void main(void)
 	timer_init();
 	SPI_init();
 	tsip_parser_reset();
+	GPS_init();
 	
 	puts("APRS Tracker\r\n");
 	puts("By SecKC\r\n");
