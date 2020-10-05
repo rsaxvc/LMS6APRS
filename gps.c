@@ -82,19 +82,24 @@ uart_tx( 0x10 );uart_tx( 0x03 );//End of frame
 }
 
 float gps_lla_packet[5];
+unsigned char gps_pkt_id;
 
 void tsip_process_packet( unsigned char id, const unsigned char * ptr, unsigned char len)
 {
+unsigned char new_tasks = TASK_GPS_PKT;
+gps_pkt_id = id;
+
 switch( id ) 
 	{
 	case TSIP_PACKET_LLA_FLOAT:
 		if( len == 20 )
 			{
 			memcpy( gps_lla_packet, ptr, 20 );
-			pend_task_irq( TASK_ID_GPS );
+			new_tasks |= TASK_ID_GPS_FIX;
 			}
 		break;
 	}
+pend_task_irq( new_tasks );
 }
 
 void GPS_init(void)

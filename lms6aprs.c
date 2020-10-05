@@ -76,9 +76,14 @@ void main(void)
 			task_b();
 			}
 		
-		if( new_tasks & TASK_GPS )
+		if( new_tasks & TASK_GPS_FIX )
 			{
-			task_gps();
+			task_gps_fix();
+			}
+		
+		if( new_tasks & TASK_GPS_PKT )
+			{
+			task_gps_pkt();
 			}
 
 		SIM();

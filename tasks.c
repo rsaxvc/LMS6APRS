@@ -2,7 +2,9 @@
  *	Copyright (c) 2020 by SECKC Software
  */
 #include <stdio.h>
+#include "stdio2.h"
 #include "tasks.h"
+#include "gps.h"
 
 void task_a( void )
 {
@@ -16,7 +18,12 @@ puts("TaskB\r\n");
 pend_task( TASK_A );
 }
 
-void task_gps( void )
+void task_gps_fix( void )
 {
-puts("TaskGPS\r\n");
+puts("TaskGpsFix\r\n");
+}
+
+void task_gps_pkt( void )
+{
+puts("TaskGpsPkt:");puts_hex_u8(gps_pkt_id);puts("\r\n");
 }
