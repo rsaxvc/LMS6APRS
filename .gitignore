@@ -6,6 +6,9 @@
 *.la
 *.map
 *.sbr
+*.hex
+*.s19
+*.TMP
 IDEA.ERR
 IDEABLD.BAT
 
