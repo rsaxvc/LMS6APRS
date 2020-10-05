@@ -46,15 +46,15 @@ void main(void)
 	puts("APRS Tracker\r\n");
 	puts("By SecKC\r\n");
 
-	CC1050_init( 0x3c, 0x64, 0x30 );
-	CC1050_tx_enable();
+//	CC1050_init( 0x3c, 0x64, 0x30 );
+/*	CC1050_tx_enable();
 	while(1)
 		{
 		CC1050_hop( 0x3b, 0xb6, 0x94 ); //KCAPRS SECONDARY 
 		delay_millis(250);
 		CC1050_hop( 0x3c, 0x64, 0x30 ); //KCAPRS PRIMARY
 		delay_millis(250);
-		}
+		}*/
 
 	pend_task( TASK_A );
 	for (;;)
