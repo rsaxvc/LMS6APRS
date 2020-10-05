@@ -88,8 +88,8 @@ sendStopBit: macro ;ARGS: BankRegister, BankPin
 #define PEDR 0xC
 #define PFDR 0xF
 
-#define PORT_REG PBDR
-#define PIN 4
+#define PORT_REG PFDR
+#define PIN 6
 
 	switch	.text
 
