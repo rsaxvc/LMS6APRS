@@ -4,7 +4,9 @@
 enum
 	{
 	TSIP_PACKET_LLA_DOUBLE = 0x84,
-	TSIP_PACKET_LLA_FLOAT  = 0x4A
+	TSIP_PACKET_LLA_FLOAT  = 0x4A,
+	TSIP_PACKET_SBAS_STATUS= 0x82,
+	TSIP_PACKET_SUPER      = 0x8F
 	};
 
 void tsip_process_packet( unsigned char id, const unsigned char * packet, unsigned char len );
