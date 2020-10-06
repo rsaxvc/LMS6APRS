@@ -17,6 +17,8 @@ gps.o
 init.o
 interrupt.o
 lms6aprs.o
+morse.o
+morse_table.o
 putchar.o
 puts.o
 spilib.o

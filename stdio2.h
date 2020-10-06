@@ -8,4 +8,6 @@
 int puts_int_u8( unsigned char i );
 int puts_hex_u4( unsigned char i );
 int puts_hex_u8( unsigned char i );
+#define puts_reg(NAME)  puts(#NAME);puts(":0x");puts_hex_u8(NAME)
+
 #endif

@@ -7,12 +7,12 @@
 
 #include "cc1050.h"
 #include "spilib.h"
+#include "stdio2.h"
 #include "gpio_def.h"
-#include <io72324.h>
 
 enum
 	{
-	REG_MAIN    = 0,
+	REG_MAIN    = 0x00,
 	REG_FREQ_2A = 0x01,
 	REG_FREQ_1A = 0x02,
 	REG_FREQ_0A = 0x03,
@@ -56,10 +56,44 @@ enum
 	REG_MAIN_RESET   = 1 << REG_MAIN_RESET_OFST
 	};
 
+#define DUMP_REG(NAME)  putchar('\t');puts(#NAME);puts(":0x");puts_hex_u8(CC1050_reg_read(NAME));puts("\r\n");
+void CC1050_print_regs( void )
+{
+puts("Starting CC1050 register dump\r\n");
+	DUMP_REG(REG_MAIN); 
+	DUMP_REG(REG_FREQ_2A); 
+	DUMP_REG(REG_FREQ_1A); 
+	DUMP_REG(REG_FREQ_0A); 
+	DUMP_REG(REG_FREQ_2B); 
+	DUMP_REG(REG_FREQ_1B); 
+	DUMP_REG(REG_FREQ_0B);
+	DUMP_REG(REG_FSEP1);   
+	DUMP_REG(REG_FSEP0); 
+	DUMP_REG(REG_CURRENT);
+	DUMP_REG(REG_XOSC);  
+	DUMP_REG(REG_PA_POW);
+	DUMP_REG(REG_PLL);    
+	DUMP_REG(REG_LOCK);    
+	DUMP_REG(REG_CAL);  
+	DUMP_REG(REG_MODEM0);  
+	DUMP_REG(REG_FSCTRL);  
+	DUMP_REG(REG_PRESCALER);
+	DUMP_REG(REG_TEST6);
+	DUMP_REG(REG_TEST5);
+	DUMP_REG(REG_TEST4);
+	DUMP_REG(REG_TEST3);
+	DUMP_REG(REG_TEST2);
+	DUMP_REG(REG_TEST1);
+	DUMP_REG(REG_TEST0);
+puts("CC1050 register dump complete\r\n");
+}
+
+
 static unsigned char reg_main;
 
 void CC1050_hop( unsigned char f2, unsigned char f1, unsigned char f0 )
 {
+//puts("Hopping to:0x");puts_hex_u8(f2);puts_hex_u8(f1);puts_hex_u8(f0);puts("\r\n");
 //Program next frequency
 if( reg_main & REG_MAIN_FREG )
 	{
@@ -77,11 +111,16 @@ else
 CC1050_reg_set( REG_MAIN, reg_main ^ REG_MAIN_FREG );
 }
 
-void CC1050_init( unsigned f2, unsigned f1, unsigned f0 )
+void CC1050_hop2( unsigned long f )
 {
-GPIO_SET( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
-delay_millis(10);
-CC1050_reg_set( REG_MAIN, 0x1A );   //Put it in reset, most modules in powerdown
+CC1050_hop( (f>>16)&0xFF, (f>>8)&0xFF, f&0xFF);
+}
+
+void CC1050_init( unsigned char f2, unsigned char f1, unsigned char f0 )
+{
+delay_millis(100);
+CC1050_reg_set( REG_MAIN, 0x1A ); //Put it in reset, most modules in powerdown
+CC1050_reg_set( REG_MAIN, 0x1A ); //Do this twice on first boot
 CC1050_reg_set( REG_MAIN, 0x1B ); //Take it out of reset
 delay_millis(2); //Wait for crystal startup
 CC1050_reg_set( REG_FREQ_2A, f2 );
@@ -107,7 +146,7 @@ CC1050_reg_set( REG_TEST3, 0x04 );
 CC1050_reg_set( REG_TEST2, 0x00 );
 CC1050_reg_set( REG_TEST1, 0x00 );
 CC1050_reg_set( REG_TEST0, 0x00 );
-CC1050_reg_set( REG_FSEP1, 0x00 );
+CC1050_reg_set( REG_FSEP1, 0x01 );
 CC1050_reg_set( REG_FSEP0, 0x00 );
 CC1050_reg_set( REG_PLL,   0x40 );//REFDIV=8
 
@@ -115,7 +154,7 @@ CC1050_reg_set( REG_PLL,   0x40 );//REFDIV=8
 
 //Do Calibration Here
 CC1050_reg_set( REG_CAL, 0x66 ); //Set CAL-DUAL
-CC1050_reg_set( REG_MAIN, 1 );
+CC1050_reg_set( REG_MAIN, 1 );   
 CC1050_reg_set( REG_CURRENT, 0x81 );
 CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_CAL, 0xE6 ); //Set CAL-START
@@ -128,15 +167,15 @@ CC1050_reg_set( REG_MAIN, 0x1F); //Powerdown
 void CC1050_tx_enable( void )
 {
 CC1050_reg_set( REG_MAIN, 0x1B );
-delay_millis(2);
+delay_millis(2);//Wait for crystal startup
 CC1050_reg_set( REG_MAIN, 0x19 );
-delay_micros(200);
+delay_micros(200); //Wait for bias generator
 CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_MAIN, 0x11 );
-delay_micros(250);
+delay_micros(250); //Wait for PLL to lock
 CC1050_reg_set( REG_MAIN, 0x01 );
-CC1050_reg_set( REG_PA_POW, 0xFF );
-delay_micros(20);
+CC1050_reg_set( REG_PA_POW, 0xFF ); //PA to full power
+delay_micros(20); //Wait for PA to stabilize
 }
 
 void CC1050_tx_disable( void )
@@ -145,14 +184,83 @@ CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_MAIN, 0x1F );
 }
 
-void CC1050_reg_set( unsigned char reg_addr, unsigned byte )
+void CC1050_reg_set( unsigned char reg_addr, unsigned char byte )
 {
+//puts("Setting 0x");puts_hex_u8(reg_addr);puts(" to 0x");puts_hex_u8(byte);puts("\r\n");
 GPIO_CLR( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
-SPI_tx_byte( ( reg_addr << 7 ) | 1 );
+SPI_tx_byte( ( reg_addr << 1 ) | 1 );//1 LSB means WRITE
 GPIO_SET( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
-if( reg_addr = REG_MAIN )
+if( reg_addr == REG_MAIN )
 	{
 	reg_main = byte;
 	}
 SPI_tx_byte( byte );
 }
+
+
+static unsigned char readbit( void )
+{
+unsigned char retn = GPIO_GET( GPIO_CC1050_PDATA_PORT, GPIO_CC1050_PDATA_PIN );
+GPIO_CLR( GPIO_CC1050_PCLK_PORT, GPIO_CC1050_PCLK_PIN );
+delay_micros(1);
+GPIO_SET( GPIO_CC1050_PCLK_PORT, GPIO_CC1050_PCLK_PIN );
+delay_micros(1);
+return retn;
+}
+
+static unsigned char writebit( unsigned char byte, unsigned char bit )
+{
+if( byte & (1<<bit))
+	{
+	GPIO_SET( GPIO_CC1050_PDATA_PORT, GPIO_CC1050_PDATA_PIN );
+	}
+else
+	{
+	GPIO_CLR( GPIO_CC1050_PDATA_PORT, GPIO_CC1050_PDATA_PIN );
+	}
+delay_micros(1);
+GPIO_CLR( GPIO_CC1050_PCLK_PORT, GPIO_CC1050_PCLK_PIN );
+delay_micros(1);
+GPIO_SET( GPIO_CC1050_PCLK_PORT, GPIO_CC1050_PCLK_PIN );
+delay_micros(1);
+}
+
+
+unsigned char CC1050_reg_read( unsigned char reg_addr )
+{
+unsigned char retn;
+signed char bit;
+reg_addr <<= 1;//Form 8-bit address for a read
+
+SPICR &= ~(1<<6);//Disable the SPI, PDATA/PCLK are now GPIO outputs
+
+GPIO_CLR( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
+delay_micros(1);
+for( bit = 7; bit >= 0; --bit )
+	{
+	writebit( reg_addr, bit);
+	}
+
+
+//Set PDATA as an input
+PCDDR &= ~GPIO_CC1050_PDATA_BIT;
+//PCOR  &= ~GPIO_CC1050_PDATA_BIT;
+
+GPIO_SET( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
+
+delay_micros(1);
+retn = 0;
+for( bit = 7; bit >= 0; --bit )
+	{
+	retn |= ( readbit() << bit );
+	}
+
+//Set PDATA back to an output
+PCDDR |= GPIO_CC1050_PDATA_BIT;
+//PCOR  |= GPIO_CC1050_PDATA_BIT;
+
+SPICR = SPICR_INIT;//Re-enable the SPI
+
+return retn;
+}
+
