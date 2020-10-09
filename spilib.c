@@ -14,10 +14,10 @@ SPICSR = 0;
 SPICR = SPICR_INIT;
 }
 
-void SPI_tx_byte( unsigned char byte )
+void SPI_tx_byte( uint8_t byte )
 {
 SPICSR; //Read SPICSR to reset SPIF
 SPIDR; //Read SPIDR to clear it out
 SPIDR = byte;
-while( ( SPICSR & ( 1<<7) ) == 0 ); //Wait for SPIF to signal TX complete
+while( ( SPICSR & ( 1<<7 ) ) == 0 ); //Wait for SPIF to signal TX complete
 }

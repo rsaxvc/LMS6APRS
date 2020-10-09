@@ -13,12 +13,12 @@
 
 static void long_delay_millis( unsigned int delay )
 {
-while( delay )
+while( delay > 255 )
 	{
-	unsigned char this_delay = delay > 255 ? 255 : delay;
-	delay_millis(this_delay);
-	delay -= this_delay;
+	delay_millis(255);
+	delay -= 255;
 	}
+delay_millis((unsigned char)delay);
 }
 
 #define BASE_DELAY (100ul)
@@ -27,7 +27,6 @@ static void delay_dot( void ){long_delay_millis(BASE_DELAY);}
 static void delay_between_dot_dash( void ){long_delay_millis(BASE_DELAY);}
 static void delay_character( void ){long_delay_millis(3*BASE_DELAY);}
 static void delay_word( void ){ long_delay_millis( 7*BASE_DELAY);}
-
 
 void morse_transmit_word( const char * str )
 {

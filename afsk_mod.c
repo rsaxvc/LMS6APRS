@@ -1,6 +1,7 @@
 /*	Example Interrupt Handlers
  *	Copyright (c) 2020 by SECKC Software
  */
+#include <stdint.h>
 #include "gpio_def.h"
 #include "interrupt.h"
 
@@ -9,12 +10,12 @@ import math
 for t in xrange(0,256):
 	print int(128+127 * math.sin(t * 2 * math.pi / 256 )),",",
 */
-static const unsigned char wavetable[]=
+static const uint8_t wavetable[]=
 {
 #include "wavetable.csv"
 };
 
-static const unsigned char dither_me_timbers[]=
+static const uint8_t dither_me_timbers[]=
 {
 0 , 1 , 1 , 1 , 1 , 0 , 1 , 1 , 1 , 1 , 0 , 1 , 1 , 0 , 1 , 0 , 1 , 0 , 1 , 0 , 1 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 0 , 0 , 1 , 0 , 0 , 1 , 0 , 1 , 0 , 1 , 0 , 1 , 0 , 1 , 1 , 0 , 1 , 1 , 1 , 1 , 0 , 1 , 1 , 1
 };

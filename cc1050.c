@@ -6,9 +6,12 @@
  */
 
 #include "cc1050.h"
-#include "spilib.h"
-#include "stdio2.h"
+#include "delay.h"
 #include "gpio_def.h"
+#include "spilib.h"
+#include <stdio.h>
+#include <stdint.h>
+#include "stdio2.h"
 
 enum
 	{
@@ -89,11 +92,15 @@ puts("CC1050 register dump complete\r\n");
 }
 
 
-static unsigned char reg_main;
+//This serves as an CPU-side shadow
+//of the CC1050 main register so that
+//we can check which frequency channel(A/B)
+//is in use without reading it back, as
+//reads are slow.
+static uint8_t reg_main;
 
-void CC1050_hop( unsigned char f2, unsigned char f1, unsigned char f0 )
+void CC1050_hop( uint8_t f2, uint8_t f1, uint8_t f0 )
 {
-//puts("Hopping to:0x");puts_hex_u8(f2);puts_hex_u8(f1);puts_hex_u8(f0);puts("\r\n");
 //Program next frequency
 if( reg_main & REG_MAIN_FREG )
 	{
@@ -107,16 +114,17 @@ else
 	CC1050_reg_set( REG_FREQ_1B, f1 );
 	CC1050_reg_set( REG_FREQ_0B, f0 );
 	}
-//Hop
-CC1050_reg_set( REG_MAIN, reg_main ^ REG_MAIN_FREG );
+//Hop to the new channel
+reg_main ^= REG_MAIN_FREG;
+CC1050_reg_set( REG_MAIN, reg_main );
 }
 
-void CC1050_hop2( unsigned long f )
+void CC1050_hop2( uint32_t f )
 {
-CC1050_hop( (f>>16)&0xFF, (f>>8)&0xFF, f&0xFF);
+CC1050_hop( (uint8_t)((f>>16) & 0xFF), (uint8_t)((f>>8)&0xFF), (uint8_t)(f&0xFF));
 }
 
-void CC1050_init( unsigned char f2, unsigned char f1, unsigned char f0 )
+void CC1050_init( uint8_t f2, uint8_t f1, uint8_t f0 )
 {
 delay_millis(100);
 CC1050_reg_set( REG_MAIN, 0x1A ); //Put it in reset, most modules in powerdown
@@ -193,11 +201,11 @@ CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_MAIN, 0x1F );
 }
 
-void CC1050_reg_set( unsigned char reg_addr, unsigned char byte )
+void CC1050_reg_set( uint8_t reg_addr, uint8_t byte )
 {
 //puts("Setting 0x");puts_hex_u8(reg_addr);puts(" to 0x");puts_hex_u8(byte);puts("\r\n");
 GPIO_CLR( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
-SPI_tx_byte( ( reg_addr << 1 ) | 1 );//1 LSB means WRITE
+SPI_tx_byte( (uint8_t)(( reg_addr << 1 ) | 1 ) );//1 LSB means WRITE
 GPIO_SET( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
 if( reg_addr == REG_MAIN )
 	{
@@ -207,9 +215,9 @@ SPI_tx_byte( byte );
 }
 
 
-static unsigned char readbit( void )
+static uint8_t readbit( void )
 {
-unsigned char retn = GPIO_GET( GPIO_CC1050_PDATA_PORT, GPIO_CC1050_PDATA_PIN );
+uint8_t retn = GPIO_GET( GPIO_CC1050_PDATA_PORT, GPIO_CC1050_PDATA_PIN );
 GPIO_CLR( GPIO_CC1050_PCLK_PORT, GPIO_CC1050_PCLK_PIN );
 delay_micros(1);
 GPIO_SET( GPIO_CC1050_PCLK_PORT, GPIO_CC1050_PCLK_PIN );
@@ -217,7 +225,7 @@ delay_micros(1);
 return retn;
 }
 
-static unsigned char writebit( unsigned char byte, unsigned char bit )
+static void writebit( uint8_t byte, uint8_t bit )
 {
 if( byte & (1<<bit))
 	{
@@ -235,13 +243,13 @@ delay_micros(1);
 }
 
 
-unsigned char CC1050_reg_read( unsigned char reg_addr )
+uint8_t CC1050_reg_read( uint8_t reg_addr )
 {
-unsigned char retn;
+uint8_t retn;
 signed char bit;
 reg_addr <<= 1;//Form 8-bit address for a read
 
-SPICR &= ~(1<<6);//Disable the SPI, PDATA/PCLK are now GPIO outputs
+SPICR &= (uint8_t)~(1<<6);//Disable the SPI, PDATA/PCLK are now GPIO outputs
 
 GPIO_CLR( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
 delay_micros(1);
@@ -252,7 +260,7 @@ for( bit = 7; bit >= 0; --bit )
 
 
 //Set PDATA as an input
-PCDDR &= ~GPIO_CC1050_PDATA_BIT;
+PCDDR &= (uint8_t)~GPIO_CC1050_PDATA_BIT;
 //PCOR  &= ~GPIO_CC1050_PDATA_BIT;
 
 GPIO_SET( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
@@ -261,7 +269,7 @@ delay_micros(1);
 retn = 0;
 for( bit = 7; bit >= 0; --bit )
 	{
-	retn |= ( readbit() << bit );
+	retn |= (uint8_t)( readbit() << bit );
 	}
 
 //Set PDATA back to an output

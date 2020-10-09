@@ -24,3 +24,9 @@ while( us )
 	us--;
 	}
 }
+
+//This delay loop takes roughly 1.4us/us
+void delay_micros2( unsigned char us )
+{
+while( --us );
+}

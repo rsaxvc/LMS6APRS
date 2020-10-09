@@ -10,7 +10,7 @@
 
 #define GPIO_CC1050_LDO_PORT PDDR
 #define GPIO_CC1050_LDO_PIN  5
-#define GPOI_CC1050_LDO_BIT  (1<<GPIO_CC1050_LDO_PIN)
+#define GPIO_CC1050_LDO_BIT  (1<<GPIO_CC1050_LDO_PIN)
 
 #define GPIO_CC1050_PALE_PORT PCDR
 #define GPIO_CC1050_PALE_PIN  0
@@ -33,8 +33,8 @@
 #define GPIO_SOFTUART_TX_BIT (1<<GPIO_SOFTUART_TX_PIN)
 
 #define GPIO_SET( PORT, PIN ) ((PORT) |=  (1<<(PIN)))
-#define GPIO_CLR( PORT, PIN ) ((PORT) &= ~(1<<(PIN)))
-#define GPIO_GET( PORT, PIN ) !!((PORT) & (1<<(PIN)))
+#define GPIO_CLR( PORT, PIN ) ((PORT) &= (unsigned char)~(1<<(PIN)))
+#define GPIO_GET( PORT, PIN ) ((unsigned char)!!((PORT) & (1<<(PIN))))
 #define GPIO_TGL( PORT, PIN ) ((PORT) ^=  (1<<(PIN)))
 
 #endif

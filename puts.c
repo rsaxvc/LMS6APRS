@@ -20,7 +20,7 @@ return 0;
 }
 
 /*put a string formatted from a uint8*/
-int puts_int_u8( unsigned char i )
+int puts_int_u8( uint8_t i )
 {
 if( i >= 200 )
 	{
@@ -35,31 +35,31 @@ else if( i >= 100 )
 
 if( i >= 10 )
 	{
-	unsigned char m = (i / 10);
-	putchar( '0' + m );
-	i -= 10 * m;
+	unsigned char m = (unsigned char)(i / 10);
+	putchar( (unsigned char)('0' + m) );
+	i -= (uint8_t)(10 * m);
 	}
 return 0;
 }
 
 /*put a hex string formatted from a uint4*/
-int puts_hex_u4( unsigned char i )
+int puts_hex_u4( uint8_t i )
 {
 if( i > 9 )
 	{
-    putchar( 'A' + i - 10 );
+    putchar( (char)('A' + i - 10) );
 	}
 else
 	{
-	putchar( '0' + i );
+	putchar( (char)('0' + i) );
 	}
 return 0;
 }
 
 /*put a hex string formatted from a uint8*/
-int puts_hex_u8( unsigned char i )
+int puts_hex_u8( uint8_t i )
 {
-puts_hex_u4( i >> 4 );
-puts_hex_u4( i & 0xF );
+puts_hex_u4( (uint8_t)(i >> 4 ) );
+puts_hex_u4( (uint8_t)(i & 0xF) );
 return 0;
 }
