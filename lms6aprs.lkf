@@ -11,6 +11,7 @@ crts.o
 
 # Put your files here
 adc.o
+afsk_mod.o
 cc1050.o
 delay.o
 gps.o
