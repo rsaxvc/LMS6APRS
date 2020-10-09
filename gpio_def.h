@@ -35,5 +35,6 @@
 #define GPIO_SET( PORT, PIN ) ((PORT) |=  (1<<(PIN)))
 #define GPIO_CLR( PORT, PIN ) ((PORT) &= ~(1<<(PIN)))
 #define GPIO_GET( PORT, PIN ) !!((PORT) & (1<<(PIN)))
+#define GPIO_TGL( PORT, PIN ) ((PORT) ^=  (1<<(PIN)))
 
 #endif

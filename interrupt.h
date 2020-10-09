@@ -4,4 +4,5 @@
 #ifndef INTERRUPT_H
 #define INTERRUPT_H
 @interrupt void bad_interrupt(void);
+@interrupt void ei0_interrupt(void);
 #endif

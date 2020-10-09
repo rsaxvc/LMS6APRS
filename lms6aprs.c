@@ -58,8 +58,6 @@ void main(void)
 	puts("By SecKC\r\n");
 
 	CC1050_init( 0x3c, 0x64, 0x30 );
-//	CC1050_init( 0x36, 0x29, 0x7b );
-	
 	#define DELAY_1S delay_millis(250);delay_millis(250);delay_millis(250);delay_millis(250)
 	morse_transmit_word( "KD0LIX" );
 
@@ -73,6 +71,7 @@ void main(void)
 		}
 */
 
+/*
 	CC1050_tx_enable();
 	while(1)
 		{
@@ -86,6 +85,7 @@ void main(void)
 			CC1050_hop( 0x3c, 0x64, i );			
 			}
 		}
+*/
 
 /*
 	CC1050_tx_enable();
@@ -118,6 +118,24 @@ void main(void)
 		GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
 		}
 */
+
+	CC1050_tx_enable();
+	GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
+	DELAY_1S;
+	GPIO_SET( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
+	DELAY_1S;
+	
+	SIM();
+	EICR = 0x10;  //Enable external Interrupt 0
+	PAOR |= 0x08; //Turn PortA.3 into an interrupt pin
+	ITSPR2 = 0xC0;//ei0, the CC1050 modulation interrupt, must be highest to prevent GPS IRQ from causing timing jitter
+	RIM();
+	
+	while(1)
+		{
+//		GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
+//		GPIO_SET( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
+		}
 
 /*
 	CC1050_hop( 0x3c, 0x64, 0x30 ); //KCAPRS PRIMARY

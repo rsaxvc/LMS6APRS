@@ -15,18 +15,18 @@ extern void _stext(); /*Reset/startup entry point*/
 #define UNUSED	bad_interrupt /* map unhandled interrupts to a loop for debugging*/
 
 void (* const _vectab[])() = {
-	UNUSED,			/* AVD     */
-	GPS_interrupt,	/* SCI     */
-	UNUSED,			/* Timer B */
-	UNUSED,			/* Timer A */
-	UNUSED,			/* SPI     */
-	UNUSED,			/* unused  */
-	UNUSED,			/* EI3     */
-	UNUSED,			/* EI2     */
-	UNUSED,			/* EI1     */
-	UNUSED,			/* EI0     */
-	UNUSED,			/* MCC/RCC */
-	UNUSED,			/* unused  */
-	UNUSED,			/* TRAP    */
-	_stext,			/* RESET   */
+	UNUSED,			/* 0xFFE4 - AVD     */
+	GPS_interrupt,	/* 0xFFE6 - SCI     */
+	UNUSED,			/* 0xFFE8 - Timer B */
+	UNUSED,			/* 0xFFEA - Timer A */
+	UNUSED,			/* 0xFFEC - SPI     */
+	UNUSED,			/* 0xFFEE - unused  */
+	UNUSED,			/* 0xFFF0 - EI3     */
+	UNUSED,			/* 0xFFF2 - EI2     */
+	UNUSED,			/* 0xFFF4 - EI1     */
+	ei0_interrupt,	/* 0xFFF6 - EI0     */
+	UNUSED,			/* 0xFFF8 - MCC/RCC */
+	UNUSED,			/* 0xFFFA - unused  */
+	UNUSED,			/* 0xFFFC - TRAP    */
+	_stext,			/* 0xFFFE - RESET   */
 	};
