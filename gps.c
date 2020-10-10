@@ -143,3 +143,52 @@ if( scisr & SCISR_RDRF_MASK )
 	tsip_parser_push( SCIDR );
 	}
 }
+
+//BELOW HERE FEATHERHAB HACKS
+char* get_timestamp() 
+{
+	return "003000.00";
+}
+	
+char* get_latitudeTrimmed() 
+{
+	return "12345.6";
+}
+char* get_latitudeLSBs()
+{
+	return "12";
+}
+
+char* get_longitudeTrimmed() 
+{
+	return "12345.6";
+}
+char* get_longitudeLSBs()
+{
+	return "34";
+}
+
+char* get_hdop() 
+{
+	return "00.0";
+}
+
+char* get_gpsaltitude()
+{
+	return "000000.0";
+}
+
+char* get_speedKnots() 
+{
+	return "000.0";
+}
+
+char* get_course() 
+{
+	return "000.0";
+}
+	
+char* get_dayofmonth() 
+{
+	return "101020";
+}

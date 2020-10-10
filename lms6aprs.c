@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "stdio2.h"
 
+#include "aprs.h"
 #include "afsk_mod.h"
 #include "cc1050.h"
 #include "asmtools.h"
@@ -60,11 +61,12 @@ void main(void)
 
 	CC1050_init( 0x3c, 0x64, 0x30 );
 	#define DELAY_1S delay_millis(250);delay_millis(250);delay_millis(250);delay_millis(250)
-//	morse_transmit_word( "KD0LIX" );
+	DELAY_1S;
+	morse_transmit_word( "KD0LIX" );
 	
-//	DELAY_1S;
+	DELAY_1S;
 	puts("Preparing AFSK\r\n");
-	afsk_send((const void*)0x8000, 0x7FFF);
+	aprs_send();
 	CC1050_tx_enable();
 	while( afsk_busy() );
 	puts("Done\r\n");
@@ -129,12 +131,14 @@ void main(void)
 		}
 */
 
+/*
 	CC1050_tx_enable();
 	GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
 	DELAY_1S;
 	GPIO_SET( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
 	DELAY_1S;
-		
+*/
+
 	while(1)
 		{
 //		GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
