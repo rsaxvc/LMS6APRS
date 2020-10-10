@@ -46,3 +46,8 @@ while( afsk_busy() );
 puts("Done\r\n");
 CC1050_tx_disable();
 }
+
+void task_gps_ovr( void )
+{
+puts("WARNING: GPS Overrun occurred\r\n");
+}

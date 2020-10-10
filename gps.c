@@ -21,10 +21,10 @@ enum
 	SCICR1_T8_BIT = 6, //9th TX bit
 	SCICR1_SCID_BIT = 5, //SCI Disable
 	SCICR1_M_BIT = 4, //word length 0=8N1, 1=9N1
-	SCISR1_WAKE_BIT = 3, //wake
-	SCISR1_PCE_BIT = 2, //parity control enable
-	SCISR1_PS_BIT = 1, //parity selection
-	SCISR1_PIE_BIT = 0, //parity interrupt enable
+	SCICR1_WAKE_BIT = 3, //wake
+	SCICR1_PCE_BIT = 2, //parity control enable
+	SCICR1_PS_BIT = 1, //parity selection
+	SCICR1_PIE_BIT = 0, //parity interrupt enable
 	
 	SCICR2_TIE_BIT = 7, //Transmit Interrupt Enable
 	SCICR2_TCIE_BIT = 6,//Transmission Complete Interrupt Enable
@@ -35,8 +35,9 @@ enum
 	SCICR2_RWU_BIT = 1, //receiver mute
 	SCICR2_SBK_BIT = 0, //send break
 	
-	SCISR_TDRE_MASK = (1<<SCISR_TDRE_MASK),
+	SCISR_TDRE_MASK = (1<<SCISR_TDRE_BIT),
 	SCISR_RDRF_MASK = (1<<SCISR_RDRF_BIT),
+	SCISR_OR_MASK   = (1<<SCISR_OR_BIT),
 	
 	SCICR2_RIE_MASK = (1<<SCICR2_RIE_BIT),
 	SCICR2_TE_MASK = (1<<SCICR2_TE_BIT),
@@ -61,7 +62,7 @@ puts("SCICR2:");puts_hex_u8(SCICR2);puts("\r\n");
 static void uart_tx( unsigned char byte )
 {
 //Wait for TX empty
-while( (SCISR & SCISR_TDRE_MASK) );
+while( !(SCISR & SCISR_TDRE_MASK) );
 
 //Load the shift register
 SCIDR = byte;
@@ -137,8 +138,15 @@ puts("Done with GPS_init\r\n");
 /*Handle GPS UART interrupts*/
 @interrupt void GPS_interrupt(void)
 {
-unsigned char scisr = SCISR;
-if( scisr & SCISR_RDRF_MASK )
+uint8_t scisr = SCISR;
+if( scisr & SCISR_OR_MASK )
+	{
+	/*Data overrun occurred*/
+	SCIDR;/*Drop the data*/
+	pend_task_irq( TASK_GPS_OVR );
+	tsip_parser_reset();
+	}
+else if( scisr & SCISR_RDRF_MASK )
 	{
 	tsip_parser_push( SCIDR );
 	}
