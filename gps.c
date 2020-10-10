@@ -4,6 +4,7 @@
 #include "tsip_parser.h"
 #include <io72324.h>
 #include <string.h>
+#include <stdint.h>
 #include "tasks.h"
 
 enum
@@ -114,7 +115,7 @@ pend_task_irq( new_tasks );
 unsigned char config_done;
 void GPS_configure(void)
 {
-static const unsigned char config_packet[] = { 0x35, 0x02, 0x00, 0x01 };
+static const unsigned char config_packet[] = { 0x35, 0x02, 0x00, 0x01, 0x00 };
 if( !config_done )
 	{
 	puts("Preparing to configure GPS\r\n");
