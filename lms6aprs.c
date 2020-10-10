@@ -59,7 +59,9 @@ void main(void)
 	puts("APRS Tracker\r\n");
 	puts("By SecKC\r\n");
 
-	CC1050_init( 0x3c, 0x64, 0x30 );
+//	CC1050_init2( 3957808 );//446.175 - low
+//	CC1050_init2( 3957764 );//446.175 on paper, 446.185 on specan- center
+	CC1050_init2( 3957675 );//446.165 on paper
 	#define DELAY_1S delay_millis(250);delay_millis(250);delay_millis(250);delay_millis(250)
 	DELAY_1S;
 	morse_transmit_word( "KD0LIX" );

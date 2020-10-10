@@ -165,8 +165,8 @@ CC1050_reg_set( REG_TEST3, 0x04 );
 CC1050_reg_set( REG_TEST2, 0x00 );
 CC1050_reg_set( REG_TEST1, 0x00 );
 CC1050_reg_set( REG_TEST0, 0x00 );
-CC1050_reg_set( REG_FSEP1, 0x01 );
-CC1050_reg_set( REG_FSEP0, 0x00 );
+CC1050_reg_set( REG_FSEP1, 0x00 );
+CC1050_reg_set( REG_FSEP0, 0x58 );
 CC1050_reg_set( REG_PLL,   0x40 );//REFDIV=8
 
 //Initial programming complete
@@ -181,6 +181,11 @@ delay_millis(26);
 CC1050_reg_set( REG_CAL, 0x66 ); //Clear CAL-START
 
 CC1050_reg_set( REG_MAIN, 0x1F); //Powerdown
+}
+
+void CC1050_init2( uint32_t f )
+{
+CC1050_init( (uint8_t)((f>>16) & 0xFF), (uint8_t)((f>>8)&0xFF), (uint8_t)(f&0xFF));
 }
 
 void CC1050_tx_enable( void )
