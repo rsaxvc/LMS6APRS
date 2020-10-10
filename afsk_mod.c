@@ -90,8 +90,6 @@ INTERRUPT void ei0_interrupt(void)
 int8_t sample;
 uint16_t txPhaseTemp;
 
-GPIO_SET(GPIO_SOFTUART_TX_PORT, GPIO_SOFTUART_TX_PIN);
-
 /* We get here 19200 times per second or 16 times per symbol */
 if (txSampleInSymbol == 0) {
 	/* Load new symbol (bit) to transmit */
@@ -146,5 +144,4 @@ else
 	OUTPUT0();
 	txQuantError = (int8_t)(sample + WAVETABLE_AMPLITUDE);
     }
-GPIO_CLR(GPIO_SOFTUART_TX_PORT, GPIO_SOFTUART_TX_PIN);
 }
