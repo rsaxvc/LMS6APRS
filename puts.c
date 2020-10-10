@@ -39,6 +39,8 @@ if( i >= 10 )
 	putchar( (unsigned char)('0' + m) );
 	i -= (uint8_t)(10 * m);
 	}
+
+putchar( (unsigned char)('0' + i) );
 return 0;
 }
 
