@@ -142,10 +142,12 @@ CC1050_reg_set( REG_XOSC, 0 );
 CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_LOCK, 0x10 );
 CC1050_reg_set( REG_CAL, 0x66 );
+//CC1050_reg_set( REG_MODEM0, 0x13 ); //1200 baud, NRZ, 14.7456MHz xtal
+//CC1050_reg_set( REG_MODEM0, 0x23 ); //2400 baud, NRZ, 14.7456MHz xtal
 //CC1050_reg_set( REG_MODEM0, 0x33 ); //4800 baud, NRZ, 14.7456MHz xtal
 //CC1050_reg_set( REG_MODEM0, 0x43 ); //9600 baud, NRZ, 14.7456MHz xtal
-//CC1050_reg_set( REG_MODEM0, 0x53 ); //19200 baud, NRZ, 14.7456MHz xtal
-CC1050_reg_set( REG_MODEM0, 0x73 ); //76800 baud, NRZ, 14.7456MHz xtal
+CC1050_reg_set( REG_MODEM0, 0x53 ); //19200 baud, NRZ, 14.7456MHz xtal
+//CC1050_reg_set( REG_MODEM0, 0x73 ); //76800 baud, NRZ, 14.7456MHz xtal
 //CC1050_reg_set( REG_MODEM0, 0x18 ); //1200 baud, UART, 14.7456MHz xtal
 CC1050_reg_set( REG_FSCTRL, 0x1 );
 //CC1050_reg_set( REG_PRESCALER, 0x80 ); //Default

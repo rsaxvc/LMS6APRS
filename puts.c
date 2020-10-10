@@ -63,3 +63,43 @@ puts_hex_u4( (uint8_t)(i >> 4 ) );
 puts_hex_u4( (uint8_t)(i & 0xF) );
 return 0;
 }
+
+/*put a hex string formatted from a uint16*/
+int puts_hex_u16( uint16_t i )
+{
+puts_hex_u4( (uint8_t)( (i >>12) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >> 8) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >> 4) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
+return 0;
+}
+
+int puts_int_s8( int8_t i )
+{
+if( i == -128 )
+	{
+	puts("-128");
+	return 0;
+	}
+
+if( i < 0 )
+	{
+	putchar( '-' );
+	i = -i;
+	}
+
+if( i > 100 )
+	{
+	putchar('1');
+	i -= 100;
+	}
+if( i > 9 )
+	{
+    putchar( (char)('0' + (i/10)) );
+	i -= 10*(i/10);
+	}
+
+putchar( (char)('0' + i) );
+	
+return 0;
+}

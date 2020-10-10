@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include "stdio2.h"
 
+#include "afsk_mod.h"
 #include "cc1050.h"
 #include "asmtools.h"
 #include "tasks.h"
@@ -59,7 +60,16 @@ void main(void)
 
 	CC1050_init( 0x3c, 0x64, 0x30 );
 	#define DELAY_1S delay_millis(250);delay_millis(250);delay_millis(250);delay_millis(250)
-	morse_transmit_word( "KD0LIX" );
+//	morse_transmit_word( "KD0LIX" );
+	
+//	DELAY_1S;
+	puts("Preparing AFSK\r\n");
+	afsk_send((const void*)0x8000, 0x7FFF);
+	CC1050_tx_enable();
+	while( afsk_busy() );
+	puts("Done\r\n");
+	CC1050_tx_disable();
+	DELAY_1S;
 
 /*
 	while(1)
@@ -124,13 +134,7 @@ void main(void)
 	DELAY_1S;
 	GPIO_SET( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );
 	DELAY_1S;
-	
-	SIM();
-	EICR = 0x10;  //Enable external Interrupt 0
-	PAOR |= 0x08; //Turn PortA.3 into an interrupt pin
-	ITSPR2 = 0xC0;//ei0, the CC1050 modulation interrupt, must be highest to prevent GPS IRQ from causing timing jitter
-	RIM();
-	
+		
 	while(1)
 		{
 //		GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN );

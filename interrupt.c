@@ -15,5 +15,9 @@
 /*Handle accidental interrupts*/
 @interrupt void bad_interrupt(void)
 	{
-	while(1);
+	while(1)
+		{
+		GPIO_SET(GPIO_SOFTUART_TX_PORT, GPIO_SOFTUART_TX_PIN);
+		GPIO_CLR(GPIO_SOFTUART_TX_PORT, GPIO_SOFTUART_TX_PIN);
+		}
 	}
