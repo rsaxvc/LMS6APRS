@@ -6,22 +6,14 @@
 #include "tasks.h"
 #include "gps.h"
 #include "tsip_parser.h"
-
-void task_a( void )
-{
-//puts("TaskA\r\n");
-pend_task( TASK_B );
-}
-
-void task_b( void )
-{
-//puts("TaskB\r\n");
-pend_task( TASK_A );
-}
+#include "cc1050.h"
+#include "aprs.h"
+#include "afsk_mod.h"
 
 void task_gps_fix( void )
 {
 puts("TaskGpsFix\r\n");
+pend_task(TASK_APRS_TX);
 }
 
 void task_gps_pkt( void )
@@ -43,4 +35,14 @@ if( gps_pkt_id == TSIP_PACKET_SBAS_STATUS )
 	{
 	GPS_configure();
 	}
+}
+
+void task_aprs_tx( void )
+{
+puts("Preparing AFSK\r\n");
+aprs_send();
+CC1050_tx_enable();
+while( afsk_busy() );
+puts("Done\r\n");
+CC1050_tx_disable();
 }
