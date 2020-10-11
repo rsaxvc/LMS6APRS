@@ -1,5 +1,26 @@
-/*	Example Interrupt Handlers
- *	Copyright (c) 2020 by SECKC Software
+/*
+ * This file based heavily on:
+ *
+ * FeatherHAB 
+ *
+ * This file is part of FeatherHAB.
+ *
+ * FeatherHab is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * FeatherHab is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with FeatherHAB. If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * Ethan Zonca
+ * Karlis Goba
+ *
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -22,7 +43,11 @@ for t in xrange(0,256):
 	print int(64 * math.sin(t * 2 * math.pi / 256 )),",",
 */
 #define WAVETABLE_AMPLITUDE 64
-static const int8_t wavetable[]=
+static const int8_t wavetable_mark[]=
+{
+#include "wavetable_half.csv"
+};
+static const int8_t wavetable_space[]=
 {
 #include "wavetable.csv"
 };
@@ -37,7 +62,7 @@ static const int8_t wavetable[]=
 #define FRAC                6
 
 /* Compute useful constants */
-#define PHASE_MAX           ((uint16_t)sizeof(wavetable) << FRAC)
+#define PHASE_MAX           ((uint16_t)sizeof(wavetable_mark) << FRAC)
 #define PHASE_DELTA_MARK    (uint16_t)((uint32_t)PHASE_MAX * FREQ_MARK / SYMBOL_RATE / SAMPLES_PER_SYMBOL)
 #define PHASE_DELTA_SPACE   (uint16_t)((uint32_t)PHASE_MAX * FREQ_SPACE / SYMBOL_RATE / SAMPLES_PER_SYMBOL) 
 
@@ -55,6 +80,7 @@ static uint16_t txBitsToSend;
 static uint16_t txSampleInSymbol;
 static uint16_t txPhase;
 static uint16_t txPhaseDelta;
+static uint8_t txSpace;
 static int8_t  txQuantError;
 
 void afsk_send(const uint8_t *message, uint16_t lengthInBits)
@@ -63,12 +89,12 @@ txBuffer = message;
 txBitsToSend = lengthInBits;
 
 txPhase = 0;
-txPhaseDelta = PHASE_DELTA_SPACE;
+txSpace = 1;
 
 txBitMask = 1;  /* LSB first */
 txSampleInSymbol = 0;
 
-txQuantError = wavetable[0];
+txQuantError = wavetable_space[0];
 
 #if defined(__CSMC__)
 SIM();
@@ -95,7 +121,7 @@ if (txSampleInSymbol == 0) {
 	/* Load new symbol (bit) to transmit */
 	if (0 == (*txBuffer & txBitMask)) {
 		/* Logical 0 - toggle the AFSK frequency */
-		txPhaseDelta ^= (PHASE_DELTA_MARK ^ PHASE_DELTA_SPACE);
+		txSpace ^= 1;
 	}
 	
 	/* Update bit extraction mask */
@@ -122,9 +148,16 @@ if (txSampleInSymbol >= SAMPLES_PER_SYMBOL) {
 }
 
 /* Update PWM amount and increment phase */
-sample = (int8_t)(wavetable[txPhase >> FRAC]);
-sample += txQuantError;
-txPhaseTemp = (uint16_t)(txPhase + txPhaseDelta);
+if( txSpace )
+	{
+	sample = (int8_t)(wavetable_space[txPhase >> FRAC]);
+	txPhaseTemp = (uint16_t)(txPhase + PHASE_DELTA_SPACE);
+	}
+else
+	{
+	sample = (int8_t)(wavetable_mark[txPhase >> FRAC]);
+	txPhaseTemp = (uint16_t)(txPhase + PHASE_DELTA_MARK);
+	}
 if( txPhaseTemp >= PHASE_MAX )
 	{
 	txPhase = txPhaseTemp - PHASE_MAX;
@@ -133,6 +166,7 @@ else
 	{
 	txPhase = txPhaseTemp;
 	}
+sample += txQuantError;
 
 if( sample > 0 )
 	{

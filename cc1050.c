@@ -157,10 +157,10 @@ CC1050_reg_set( REG_TEST6, 0x10 );
 CC1050_reg_set( REG_TEST5, 0x08 );
 //CC1050_reg_set( REG_TEST4, 0x3F ); //For Baud Rates up to 76800
 //CC1050_reg_set( REG_TEST4, 0x25 ); //For Baud Rates up to 19200
-//CC1050_reg_set( REG_TEST4, 0x12 ); //Undocumented but should be lower bandwidth
+CC1050_reg_set( REG_TEST4, 0x12 ); //Undocumented but should be lower bandwidth
 //CC1050_reg_set( REG_TEST4, 0x09 ); //Undocumented but should be lower bandwidth
 //CC1050_reg_set( REG_TEST4, 0x05 ); //Undocumented but should be lower bandwidth
-CC1050_reg_set( REG_TEST4, 0x03 ); //Undocumented but should be lower bandwidth
+//CC1050_reg_set( REG_TEST4, 0x03 ); //Undocumented but should be lower bandwidth
 CC1050_reg_set( REG_TEST3, 0x04 );
 CC1050_reg_set( REG_TEST2, 0x00 );
 CC1050_reg_set( REG_TEST1, 0x00 );
@@ -197,9 +197,9 @@ delay_micros(200); //Wait for bias generator
 CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_MAIN, 0x11 );
 delay_micros(250); //Wait for PLL to lock
-CC1050_reg_set( REG_MAIN, 0x01 );
 CC1050_reg_set( REG_PA_POW, 0xFF ); //PA to full power
 delay_micros(20); //Wait for PA to stabilize
+CC1050_reg_set( REG_MAIN, 0x01 );
 }
 
 void CC1050_tx_disable( void )
