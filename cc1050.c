@@ -59,10 +59,10 @@ enum
 	REG_MAIN_RESET   = 1 << REG_MAIN_RESET_OFST
 	};
 
-#define DUMP_REG(NAME)  putchar('\t');puts(#NAME);puts(":0x");puts_hex_u8(CC1050_reg_read(NAME));puts("\r\n");
+#define DUMP_REG(NAME)  putchar('\t');putstr(#NAME);putstr(":0x");put_hex_u8(CC1050_reg_read(NAME));putstr("\r\n");
 void CC1050_print_regs( void )
 {
-puts("Starting CC1050 register dump\r\n");
+puts("Starting CC1050 register dump");
 	DUMP_REG(REG_MAIN); 
 	DUMP_REG(REG_FREQ_2A); 
 	DUMP_REG(REG_FREQ_1A); 
@@ -88,7 +88,7 @@ puts("Starting CC1050 register dump\r\n");
 	DUMP_REG(REG_TEST2);
 	DUMP_REG(REG_TEST1);
 	DUMP_REG(REG_TEST0);
-puts("CC1050 register dump complete\r\n");
+puts("CC1050 register dump complete");
 }
 
 
@@ -210,7 +210,7 @@ CC1050_reg_set( REG_MAIN, 0x1F );
 
 void CC1050_reg_set( uint8_t reg_addr, uint8_t byte )
 {
-//puts("Setting 0x");puts_hex_u8(reg_addr);puts(" to 0x");puts_hex_u8(byte);puts("\r\n");
+//putstr("Setting 0x");put_hex_u8(reg_addr);putstr(" to 0x");put_hex_u8(byte);putstr("\r\n");
 GPIO_CLR( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );
 SPI_tx_byte( (uint8_t)(( reg_addr << 1 ) | 1 ) );//1 LSB means WRITE
 GPIO_SET( GPIO_CC1050_PALE_PORT, GPIO_CC1050_PALE_PIN );

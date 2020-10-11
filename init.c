@@ -45,13 +45,13 @@ void timer_init(void)
 
 void print_gpio_states( void )
 {
-puts("Dumping GPIO states\r\n");
-#define DUMP_REG(NAME)  putchar('\t');puts(#NAME);puts(":0x");puts_hex_u8(NAME);puts("\r\n");
+puts("Dumping GPIO states");
+#define DUMP_REG(NAME)  putchar('\t');putstr(#NAME);putstr(":0x");put_hex_u8(NAME);putstr("\r\n");
 DUMP_REG(PADDR);DUMP_REG(PAOR);DUMP_REG(PADR);
 DUMP_REG(PBDDR);DUMP_REG(PBOR);DUMP_REG(PBDR);
 DUMP_REG(PCDDR);DUMP_REG(PCOR);DUMP_REG(PCDR);
 DUMP_REG(PDDDR);DUMP_REG(PDOR);DUMP_REG(PDDR);
 DUMP_REG(PEDDR);DUMP_REG(PEOR);DUMP_REG(PEDR);
 DUMP_REG(PFDDR);DUMP_REG(PFOR);DUMP_REG(PFDR);
-puts("Done dumping GPIO states\r\n");
+puts("Done dumping GPIO states");
 }

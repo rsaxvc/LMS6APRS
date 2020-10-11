@@ -30,7 +30,7 @@ static void delay_word( void ){ long_delay_millis( 7*BASE_DELAY);}
 
 void morse_transmit_word( const char * str )
 {
-puts("MORSE TX:");
+putstr("MORSE TX:");
 while( *str )
 	{
 	const char * morse = morse_code_from_asc(*str);
@@ -56,5 +56,5 @@ while( *str )
 	str++;
 	}
 delay_word();
-puts("\r\n");
+putstr("\r\n");
 }

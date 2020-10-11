@@ -82,7 +82,7 @@ Cmd=
 5=morse_table.c
 6=gps.c
 7=tsip_parser\tsip_conversions.c
-8=puts.c
+8=stdio.c
 9=delay.c
 10=cc1050.c
 11=spilib.c
@@ -124,7 +124,7 @@ FileName=tsip_parser\tsip_conversions.c
 TOOL=cxst7
 DefsChanged=0
 [FILE8OPTS]
-FileName=puts.c
+FileName=stdio.c
 TOOL=cxst7
 DefsChanged=0
 [FILE9OPTS]

@@ -37,9 +37,9 @@ tasks |= new_tasks;
 
 static void print_portf_registers( void )
 {
-puts("PFDDR:");puts_hex_u8(PFDDR);puts("\r\n");
-puts("PFOR :");puts_hex_u8(PFOR );puts("\r\n");
-puts("PFDR :");puts_hex_u8(PFDR );puts("\r\n");
+putstr("PFDDR:");put_hex_u8(PFDDR);putstr("\r\n");
+putstr("PFOR :");put_hex_u8(PFOR );putstr("\r\n");
+putstr("PFDR :");put_hex_u8(PFDR );putstr("\r\n");
 }
 
 static const char example_packet[] = { 0x10, 0x01, 'H','E','L','L','O',0,0x10,0x03 };
@@ -55,9 +55,8 @@ void main(void)
 	tsip_parser_reset();
 	GPS_init();
 	
-	puts("\r\n");
-	puts("APRS Tracker\r\n");
-	puts("By SecKC\r\n");
+	puts("APRS Tracker");
+	puts("By SecKC");
 
 //	CC1050_init2( 3957808 );//446.175 on paper - low FSK
 //	CC1050_init2( 3957764 );//446.175 on paper, 446.185 on specan - center

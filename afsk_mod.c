@@ -70,8 +70,8 @@ static const int8_t wavetable_space[]=
     #define OUTPUT1() GPIO_SET( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN )
     #define OUTPUT0() GPIO_CLR( GPIO_CC1050_DI_PORT, GPIO_CC1050_DI_PIN )
 #else
-    #define OUTPUT1() puts("1,")
-    #define OUTPUT0() puts("0,")
+    #define OUTPUT1() puts("1")
+    #define OUTPUT0() puts("0")
 #endif
 
 static uint8_t *txBuffer;

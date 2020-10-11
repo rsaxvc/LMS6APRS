@@ -23,8 +23,8 @@ lms6aprs.o
 morse.o
 morse_table.o
 putchar.o
-puts.o
 spilib.o
+stdio.o
 tasks.o
 tsip_parser\tsip_conversions.o
 tsip_parser\tsip_parser.o

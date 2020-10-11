@@ -53,13 +53,6 @@ SCICR2 = SCICR2_RIE_MASK|SCICR2_TE_MASK|SCICR2_RE_MASK;
 SCIBRR = 0xC0; //BaudRateDivider=13, so BaudRate = FCPU/16/13 = 38400 baud
 }
 
-static void print_sci_registers( void )
-{
-puts("SCISR:");puts_hex_u8(SCISR);puts("\r\n");
-puts("SCICR1:");puts_hex_u8(SCICR1);puts("\r\n");
-puts("SCICR2:");puts_hex_u8(SCICR2);puts("\r\n");
-}
-
 static void uart_tx( unsigned char byte )
 {
 //Wait for TX empty
@@ -158,12 +151,12 @@ switch( config_done )
 void GPS_init(void)
 {
 config_done = 0;
-puts("GPS_init called\r\n");
+puts("GPS_init called");
 tsip_parser_reset();
-puts("parser reset\r\n");
+puts("parser reset");
 uart_init();
-puts("UART init complete\r\n");
-puts("Done with GPS_init\r\n");
+puts("UART init complete");
+puts("Done with GPS_init");
 }
 
 /*Handle GPS UART interrupts*/

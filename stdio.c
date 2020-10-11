@@ -9,7 +9,7 @@
 #include <stdio2.h>
 
 /*We use a custom puts, because the default appends a newline*/
-int puts( const char * s )
+int putstr( const char * s )
 {
 while( *s )
 	{
@@ -20,7 +20,7 @@ return 0;
 }
 
 /*put a string formatted from a uint8*/
-int puts_int_u8( uint8_t i )
+int put_int_u8( uint8_t i )
 {
 if( i >= 200 )
 	{
@@ -45,7 +45,7 @@ return 0;
 }
 
 /*put a hex string formatted from a uint4*/
-int puts_hex_u4( uint8_t i )
+int put_hex_u4( uint8_t i )
 {
 if( i > 9 )
 	{
@@ -59,38 +59,38 @@ return 0;
 }
 
 /*put a hex string formatted from a uint8*/
-int puts_hex_u8( uint8_t i )
+int put_hex_u8( uint8_t i )
 {
-puts_hex_u4( (uint8_t)(i >> 4 ) );
-puts_hex_u4( (uint8_t)(i & 0xF) );
+put_hex_u4( (uint8_t)(i >> 4 ) );
+put_hex_u4( (uint8_t)(i & 0xF) );
 return 0;
 }
 
 /*put a hex string formatted from a uint16*/
-int puts_hex_u16( uint16_t i )
+int put_hex_u16( uint16_t i )
 {
-puts_hex_u4( (uint8_t)( (i >>12) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >> 8) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >> 4) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >>12) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >> 8) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >> 4) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
 return 0;
 }
 
 /*put a hex string formatted from a uint16*/
-int puts_hex_u32( uint32_t i )
+int put_hex_u32( uint32_t i )
 {
-puts_hex_u4( (uint8_t)( (i >>28) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >>24) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >>20) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >>16) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >>12) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >> 8) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >> 4) & 0xF ) );
-puts_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >>28) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >>24) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >>20) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >>16) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >>12) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >> 8) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >> 4) & 0xF ) );
+put_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
 return 0;
 }
 
-int puts_int_s8( int8_t i )
+int put_int_s8( int8_t i )
 {
 if( i == -128 )
 	{
