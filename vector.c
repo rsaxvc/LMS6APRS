@@ -9,8 +9,9 @@
  *  address
  */
 
-#include "interrupt.h"
+#include "afsk_mod.h"
 #include "gps.h"
+#include "interrupt.h"
 extern void _stext(); /*Reset/startup entry point*/
 #define UNUSED	bad_interrupt /* map unhandled interrupts to a loop for debugging*/
 
