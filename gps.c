@@ -5,6 +5,8 @@
 #include "tsip_parser.h"
 #include <io72324.h>
 #include <string.h>
+#include <stdio.h>
+#include "stdio2.h"
 #include "tasks.h"
 
 enum
@@ -45,6 +47,12 @@ enum
 	SCICR2_RE_MASK = (1<<SCICR2_RE_BIT)
 	};
 
+static float  gps_lla_packet[5];
+static uint8_t gps_pkt_len;
+static uint8_t gps_pkt_id;
+static uint8_t gps_pkt_super;
+static uint8_t gps_config_done;/*GPS configuration state machine*/
+
 /*Init the UART for RX interrupts and 38400 baud*/
 static void uart_init( void )
 {
@@ -53,6 +61,11 @@ SCICR2 = SCICR2_RIE_MASK|SCICR2_TE_MASK|SCICR2_RE_MASK;
 SCIBRR = 0xC0; //BaudRateDivider=13, so BaudRate = FCPU/16/13 = 38400 baud
 }
 
+/*
+Wait for transmitter ready.
+Load a byte into the transmitter
+Do not wait for transmission complete
+*/
 static void uart_tx( unsigned char byte )
 {
 //Wait for TX empty
@@ -62,6 +75,7 @@ while( !(SCISR & SCISR_TDRE_MASK) );
 SCIDR = byte;
 }
 
+/*Transmit a TSIP frame. Handle start of packet and escaping*/
 static void tsip_tx( unsigned char len, const unsigned char * packet )
 {
 uart_tx( 0x10 ); //Start of frame as long as not followed by another DLE/0x10
@@ -82,11 +96,7 @@ while( len )
 uart_tx( 0x10 );uart_tx( 0x03 );//End of frame
 }
 
-float  gps_lla_packet[5];
-uint8_t gps_pkt_len;
-uint8_t gps_pkt_id;
-uint8_t gps_pkt_super;
-
+/*Process a received TSIP packet. This is called on an interrupt so no heavy processing here*/
 void tsip_process_packet( unsigned char id, const unsigned char * ptr, unsigned char len)
 {
 unsigned char new_tasks = TASK_GPS_PKT;
@@ -108,8 +118,9 @@ switch( id )
 pend_task_irq( new_tasks );
 }
 
-unsigned char config_done;
-void GPS_configure(void)
+/*Configure the GPS chipset. This is called at roughly 1Hz when the GPS is powered,
+send one packet each time until all packets are sent*/
+static void gps_configure(void)
 {
 //Enable 32-bit float and 32-bit fixed point packets.
 //Once we have a parser for either remove the other.
@@ -124,33 +135,33 @@ static const unsigned char config_packet_0x8e_2a[] = { 0x8E, 0x2A, 0x00 };
 //Disable 0x8F-2B packets
 static const unsigned char config_packet_0x8e_2b[] = { 0x8E, 0x2B, 0x00 };
 
-switch( config_done )
+switch( gps_config_done )
 	{
 	case 0:
 		tsip_tx( sizeof(config_packet_0x35), config_packet_0x35 );
-		config_done++;
+		gps_config_done++;
 		break;
 
 	case 1:
 		tsip_tx( sizeof(config_packet_0x8e_23), config_packet_0x8e_23 );
-		config_done++;
+		gps_config_done++;
 		break;
 
 	case 2:
 		tsip_tx( sizeof(config_packet_0x8e_2a), config_packet_0x8e_2a );
-		config_done++;
+		gps_config_done++;
 		break;
 
 	case 3:
 		tsip_tx( sizeof(config_packet_0x8e_2b), config_packet_0x8e_2b );
-		config_done++;
+		gps_config_done++;
 		break;
 	}
 }
 
 void GPS_init(void)
 {
-config_done = 0;
+gps_config_done = 0;
 puts("GPS_init called");
 tsip_parser_reset();
 puts("parser reset");
@@ -223,4 +234,51 @@ char* get_course()
 char* get_dayofmonth() 
 {
 	return "101020";
+}
+
+//BELOW HERE ARE GPS-RELATED TASKS
+
+/*This task processes GPS fixes*/
+void task_gps_fix( void )
+{
+#define ICD_GPS_200_PI 3.1415926535898f
+#define ICD_GPS_200_RAD2DEG (180.0f/ICD_GPS_200_PI)
+putstr("TaskGpsFix:0x");
+put_hex_u32( *(uint32_t*)&gps_lla_packet[0]);
+putstr(",0x");
+put_hex_u32( *(uint32_t*)&gps_lla_packet[1]);
+putstr("\r\n");
+//pend_task(TASK_APRS_TX);
+}
+
+/*this task prints GPS packet IDs for debugging*/
+void task_gps_pkt( void )
+{
+putstr("TaskGpsPkt:");
+if( gps_pkt_id == TSIP_PACKET_SUPER )
+	{
+	put_hex_u8(gps_pkt_id);
+	putstr(" SuperId:");
+	put_hex_u8(gps_pkt_super);
+	}
+else
+	{
+	put_hex_u8(gps_pkt_id);
+	}
+putstr(" len:");put_int_u8(gps_pkt_len);
+putstr("\r\n");
+
+/*This packet is the last in a batch,
+The first one means the GPS is ready to
+accept new configurations*/
+if( gps_pkt_id == TSIP_PACKET_SBAS_STATUS )
+	{
+	gps_configure();
+	}
+}
+
+/*this task prints a warning when the UART is not serviced often enough*/
+void task_gps_ovr( void )
+{
+puts("WARNING: GPS Overrun occurred");
 }
