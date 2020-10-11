@@ -36,8 +36,7 @@
  */
 #include "tsip_parser.h"
 
-#define BUFFER_LEN 100
-static unsigned char parse_data[100];
+static unsigned char parse_data[TSIP_MAX_PACKET_LEN];
 static unsigned char parse_index;
 
 static void start_packet( void )
@@ -47,7 +46,7 @@ parse_index = 0;
 
 static void append_packet( unsigned char ch )
 {
-if( parse_index < BUFFER_LEN )
+if( parse_index < TSIP_MAX_PACKET_LEN )
     {
     parse_data[parse_index] = ch;
     }
@@ -57,7 +56,7 @@ parse_index++;
 static void end_packet( void )
 {
 if( parse_index > 0 ) {
-	tsip_process_packet( parse_data[0], parse_data+1, parse_index-1);
+	tsip_process_packet( parse_data[0], parse_data+1, (unsigned char)(parse_index-1));
 	}
 }
 

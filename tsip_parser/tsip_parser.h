@@ -1,6 +1,8 @@
 #ifndef TSIP_PARSER_H
 #define TSIP_PARSER_H
 
+#define TSIP_MAX_PACKET_LEN 100
+
 enum
 	{
 	TSIP_PACKET_LLA_DOUBLE = 0x84,
