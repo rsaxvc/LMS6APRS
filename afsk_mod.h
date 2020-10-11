@@ -3,6 +3,7 @@
  */
 #ifndef AFSK_MOD_H
 #define AFSK_MOD_H
+#include <stdint.h>
 @interrupt void ei0_interrupt(void);
 
 void afsk_send(const uint8_t *message, uint16_t lengthInBits);
