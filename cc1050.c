@@ -166,7 +166,7 @@ CC1050_reg_set( REG_TEST2, 0x00 );
 CC1050_reg_set( REG_TEST1, 0x00 );
 CC1050_reg_set( REG_TEST0, 0x00 );
 CC1050_reg_set( REG_FSEP1, 0x00 );
-CC1050_reg_set( REG_FSEP0, 0x58 );
+CC1050_reg_set( REG_FSEP0, 26 ); //Roughly 3kHz deviation
 CC1050_reg_set( REG_PLL,   0x40 );//REFDIV=8
 
 //Initial programming complete
