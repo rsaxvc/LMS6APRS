@@ -49,6 +49,12 @@ void task_aprs_tx( void )
 puts("Preparing AFSK\r\n");
 aprs_send();
 CC1050_tx_enable();
+//At this point ei0, the modulation interrupt, is enabled.
+//We must not disabled interrupts until afsk_busy() returns
+//false. Of note, the standard output functions like puts
+//also disable interrupts for about 20 microseconds per
+//character, which may goober up the transmit interrupt timing,
+//so make sure not to call those here either.
 while( afsk_busy() );
 puts("Done\r\n");
 CC1050_tx_disable();
