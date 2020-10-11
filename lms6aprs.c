@@ -37,9 +37,9 @@ tasks |= new_tasks;
 
 static void print_portf_registers( void )
 {
-putstr("PFDDR:");put_hex_u8(PFDDR);putstr("\r\n");
-putstr("PFOR :");put_hex_u8(PFOR );putstr("\r\n");
-putstr("PFDR :");put_hex_u8(PFDR );putstr("\r\n");
+putstr("PFDDR:");put_hex_u8(PFDDR);putstr("\n");
+putstr("PFOR :");put_hex_u8(PFOR );putstr("\n");
+putstr("PFDR :");put_hex_u8(PFDR );putstr("\n");
 }
 
 static const char example_packet[] = { 0x10, 0x01, 'H','E','L','L','O',0,0x10,0x03 };

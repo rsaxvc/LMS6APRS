@@ -141,7 +141,7 @@ switch( gps_config_done )
 		tsip_tx( sizeof(config_packet_0x35), config_packet_0x35 );
 		gps_config_done++;
 		break;
-
+/*
 	case 1:
 		tsip_tx( sizeof(config_packet_0x8e_23), config_packet_0x8e_23 );
 		gps_config_done++;
@@ -156,6 +156,7 @@ switch( gps_config_done )
 		tsip_tx( sizeof(config_packet_0x8e_2b), config_packet_0x8e_2b );
 		gps_config_done++;
 		break;
+*/
 	}
 }
 
@@ -247,7 +248,7 @@ putstr("TaskGpsFix:0x");
 put_hex_u32( *(uint32_t*)&gps_lla_packet[0]);
 putstr(",0x");
 put_hex_u32( *(uint32_t*)&gps_lla_packet[1]);
-putstr("\r\n");
+putstr("\n");
 //pend_task(TASK_APRS_TX);
 }
 
@@ -266,7 +267,7 @@ else
 	put_hex_u8(gps_pkt_id);
 	}
 putstr(" len:");put_int_u8(gps_pkt_len);
-putstr("\r\n");
+putstr("\n");
 
 /*This packet is the last in a batch,
 The first one means the GPS is ready to

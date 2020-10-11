@@ -56,5 +56,5 @@ while( *str )
 	str++;
 	}
 delay_word();
-putstr("\r\n");
+putstr("\n");
 }
