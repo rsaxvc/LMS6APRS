@@ -76,6 +76,20 @@ puts_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
 return 0;
 }
 
+/*put a hex string formatted from a uint16*/
+int puts_hex_u32( uint32_t i )
+{
+puts_hex_u4( (uint8_t)( (i >>28) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >>24) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >>20) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >>16) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >>12) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >> 8) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >> 4) & 0xF ) );
+puts_hex_u4( (uint8_t)( (i >> 0) & 0xF ) );
+return 0;
+}
+
 int puts_int_s8( int8_t i )
 {
 if( i == -128 )
@@ -87,7 +101,7 @@ if( i == -128 )
 if( i < 0 )
 	{
 	putchar( '-' );
-	i = -i;
+	i = (int8_t)-i;
 	}
 
 if( i > 100 )
