@@ -62,10 +62,9 @@ void main(void)
 //	CC1050_init2( 3957764 );//446.175 on paper, 446.185 on specan - center
 	CC1050_init2( 3957675 );//446.165 on paper, 446.175 on specan - center
 
-	#define DELAY_1S delay_millis(250);delay_millis(250);delay_millis(250);delay_millis(250)
-	DELAY_1S;
+	delay_seconds(1);
 	morse_transmit_word( "KD0LIX" );
-	DELAY_1S;
+	delay_seconds(1);
 	
 	pend_task(TASK_APRS_TX);
 	
