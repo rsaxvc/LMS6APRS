@@ -1,10 +1,10 @@
 /*	GPS Driver
  *	Copyright (c) 2020 by SecKC Software
  */
+#include "gps.h"
 #include "tsip_parser.h"
 #include <io72324.h>
 #include <string.h>
-#include <stdint.h>
 #include "tasks.h"
 
 enum
@@ -89,20 +89,23 @@ while( len )
 uart_tx( 0x10 );uart_tx( 0x03 );//End of frame
 }
 
-float gps_lla_packet[5];
-unsigned char gps_pkt_id;
-unsigned char gps_pkt_super;
+float  gps_lla_packet[5];
+uint8_t gps_pkt_len;
+uint8_t gps_pkt_id;
+uint8_t gps_pkt_super;
+
 void tsip_process_packet( unsigned char id, const unsigned char * ptr, unsigned char len)
 {
 unsigned char new_tasks = TASK_GPS_PKT;
 gps_pkt_id = id;
+gps_pkt_len = len;
 switch( id ) 
 	{
 	case TSIP_PACKET_LLA_FLOAT:
 		if( len == 20 )
 			{
 			memcpy( gps_lla_packet, ptr, 20 );
-			new_tasks |= TASK_ID_GPS_FIX;
+			new_tasks |= TASK_GPS_FIX;
 			}
 		break;
 	case TSIP_PACKET_SUPER:
@@ -115,13 +118,40 @@ pend_task_irq( new_tasks );
 unsigned char config_done;
 void GPS_configure(void)
 {
-static const unsigned char config_packet[] = { 0x35, 0x02, 0x00, 0x01, 0x00 };
-if( !config_done )
+//Enable 32-bit float and 32-bit fixed point packets.
+//Once we have a parser for either remove the other.
+static const unsigned char config_packet_0x35[] = { 0x35, 0x22, 0x00, 0x01, 0x00 }; 
+
+//Enable 0x8F-23 packets
+static const unsigned char config_packet_0x8e_23[] = { 0x8E, 0x23, 0x01 };
+
+//Disable 0x8F-2A packets
+static const unsigned char config_packet_0x8e_2a[] = { 0x8E, 0x2A, 0x00 };
+
+//Disable 0x8F-2B packets
+static const unsigned char config_packet_0x8e_2b[] = { 0x8E, 0x2B, 0x00 };
+
+switch( config_done )
 	{
-	puts("Preparing to configure GPS\r\n");
-	tsip_tx( sizeof(config_packet), config_packet );
-	puts("GPS config done\r\n");
-	config_done = 1;
+	case 0:
+		tsip_tx( sizeof(config_packet_0x35), config_packet_0x35 );
+		config_done++;
+		break;
+
+	case 1:
+		tsip_tx( sizeof(config_packet_0x8e_23), config_packet_0x8e_23 );
+		config_done++;
+		break;
+
+	case 2:
+		tsip_tx( sizeof(config_packet_0x8e_2a), config_packet_0x8e_2a );
+		config_done++;
+		break;
+
+	case 3:
+		tsip_tx( sizeof(config_packet_0x8e_2b), config_packet_0x8e_2b );
+		config_done++;
+		break;
 	}
 }
 
@@ -161,7 +191,7 @@ char* get_timestamp()
 	
 char* get_latitudeTrimmed() 
 {
-	return "12345.6";
+	return "00123.6";
 }
 char* get_latitudeLSBs()
 {
@@ -170,7 +200,7 @@ char* get_latitudeLSBs()
 
 char* get_longitudeTrimmed() 
 {
-	return "12345.6";
+	return "00345.6";
 }
 char* get_longitudeLSBs()
 {

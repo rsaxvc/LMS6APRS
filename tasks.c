@@ -12,8 +12,14 @@
 
 void task_gps_fix( void )
 {
-puts("TaskGpsFix\r\n");
-pend_task(TASK_APRS_TX);
+#define ICD_GPS_200_PI 3.1415926535898f
+#define ICD_GPS_200_RAD2DEG (180.0f/ICD_GPS_200_PI)
+puts("TaskGpsFix:0x");
+puts_hex_u32( *(uint32_t*)&gps_lla_packet[0]);
+puts(",0x");
+puts_hex_u32( *(uint32_t*)&gps_lla_packet[1]);
+puts("\r\n");
+//pend_task(TASK_APRS_TX);
 }
 
 void task_gps_pkt( void )
@@ -29,6 +35,7 @@ else
 	{
 	puts_hex_u8(gps_pkt_id);
 	}
+puts(" len:");puts_int_u8(gps_pkt_len);
 puts("\r\n");
 
 if( gps_pkt_id == TSIP_PACKET_SBAS_STATUS )
