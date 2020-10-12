@@ -12,6 +12,23 @@ and simulating them. However, it appears that not all
 peripherals are supported, but at least GPIOs work and
 the simulation of the ST7 core appears to be cycle-accurate.
 
+-Programming-
+I'm using the ST Visual Programmer with a Raisonance RLink.
+The ST7 used has only about 100 programming cycles, so
+it's likely to burn some out.
+
+In STVP, make sure the following settings are chosen:
+	Hardware:RLINK
+	Port:USB
+	Programming Mode:ICP OPT Enable
+	Device:ST72F324x6
+	Option Byte 0:0xE7
+	Option Byte 1:0xF7
+	Project:Properties:Blank check before programming
+	Project:Properties:Verify after programming
+	Project:Properties:Display a popup window when an error occurs
+	Project:Properties:Erase device memory before programming
+
 -Endianness-
 Since this is an 8bit CPU, endianness is largely a
 toolchain / software problem. The ST7 compiler appears
