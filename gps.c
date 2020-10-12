@@ -47,11 +47,11 @@ enum
 	SCICR2_RE_MASK = (1<<SCICR2_RE_BIT)
 	};
 
-static float  gps_lla_packet[5];
 static uint8_t gps_pkt_len;
 static uint8_t gps_pkt_id;
 static uint8_t gps_pkt_super;
 static uint8_t gps_config_done;/*GPS configuration state machine*/
+static uint8_t gps_compact_fix_packet[29];
 
 /*Init the UART for RX interrupts and 38400 baud*/
 static void uart_init( void )
@@ -103,16 +103,14 @@ unsigned char new_tasks = TASK_GPS_PKT;
 gps_pkt_id = id;
 gps_pkt_len = len;
 switch( id ) 
-	{
-	case TSIP_PACKET_LLA_FLOAT:
-		if( len == 20 )
-			{
-			memcpy( gps_lla_packet, ptr, 20 );
-			new_tasks |= TASK_GPS_FIX;
-			}
-		break;
+	{		
 	case TSIP_PACKET_SUPER:
 		gps_pkt_super = ptr[0];
+		if( ptr[0] == 0x23 && len == 29 )
+			{
+			memcpy( gps_compact_fix_packet, ptr, 29 );
+			new_tasks |= TASK_GPS_FIX;
+			}
 		break;
 	}
 pend_task_irq( new_tasks );
@@ -122,12 +120,13 @@ pend_task_irq( new_tasks );
 send one packet each time until all packets are sent*/
 static void gps_configure(void)
 {
-//Enable 32-bit float and 32-bit fixed point packets.
+//Enable 32-bit fixed point packets.
 //Once we have a parser for either remove the other.
-static const unsigned char config_packet_0x35[] = { 0x35, 0x22, 0x00, 0x01, 0x00 }; 
+static const unsigned char config_packet_0x35[] = { 0x35, 0x20, 0x00, 0x01, 0x00 }; 
 
 //Enable 0x8F-23 packets
 static const unsigned char config_packet_0x8e_23[] = { 0x8E, 0x23, 0x01 };
+
 
 //Disable 0x8F-2A packets
 static const unsigned char config_packet_0x8e_2a[] = { 0x8E, 0x2A, 0x00 };
@@ -141,7 +140,7 @@ switch( gps_config_done )
 		tsip_tx( sizeof(config_packet_0x35), config_packet_0x35 );
 		gps_config_done++;
 		break;
-/*
+
 	case 1:
 		tsip_tx( sizeof(config_packet_0x8e_23), config_packet_0x8e_23 );
 		gps_config_done++;
@@ -156,7 +155,6 @@ switch( gps_config_done )
 		tsip_tx( sizeof(config_packet_0x8e_2b), config_packet_0x8e_2b );
 		gps_config_done++;
 		break;
-*/
 	}
 }
 
@@ -165,9 +163,7 @@ void GPS_init(void)
 gps_config_done = 0;
 puts("GPS_init called");
 tsip_parser_reset();
-puts("parser reset");
 uart_init();
-puts("UART init complete");
 puts("Done with GPS_init");
 }
 
@@ -188,39 +184,20 @@ else if( scisr & SCISR_RDRF_MASK )
 	}
 }
 
+//BELOW HERE FEATHERHAB BUFFERS
+static char latitude_formatted[9];//4903.50N is 49 degrees 3 minutes 30 seconds north.
+static char longitude_formatted[10];//07201.75W is 72 degrees 1 minute 45 seconds west.
+static char altitude_formatted[7];
+
 //BELOW HERE FEATHERHAB HACKS
 char* get_timestamp() 
 {
-	return "003000.00";
-}
-	
-char* get_latitudeTrimmed() 
-{
-	return "00123.6";
-}
-char* get_latitudeLSBs()
-{
-	return "12";
+	return "003100.00";
 }
 
-char* get_longitudeTrimmed() 
-{
-	return "00345.6";
-}
-char* get_longitudeLSBs()
-{
-	return "34";
-}
-
-char* get_hdop() 
-{
-	return "00.0";
-}
-
-char* get_gpsaltitude()
-{
-	return "000000.0";
-}
+char* get_latitudeTrimmed(){return latitude_formatted;}
+char* get_longitudeTrimmed(){return longitude_formatted;}
+char* get_gpsaltitude(){return altitude_formatted;}
 
 char* get_speedKnots() 
 {
@@ -231,10 +208,126 @@ char* get_course()
 {
 	return "000.0";
 }
-	
+
 char* get_dayofmonth() 
 {
 	return "101020";
+}
+
+//BELOW HERE WE POPULATE THE FeatherHAB APIs
+//4903.50N is 49 degrees 3 minutes 30 seconds north.
+static void parse_latitude_into_aprs( int32_t latitude )
+{
+static const uint32_t scales[]=
+    {
+    119304648,
+    11930465,
+    1988411,
+    198842,
+    0,
+    19885,
+    1989
+    };
+	
+uint8_t i;
+
+if( latitude > 0 )
+    {
+    latitude_formatted[7] = 'N';
+    }
+else
+    {
+    latitude = -latitude;
+    latitude_formatted[7] = 'S';
+    }
+
+//Latitude is now positive
+for( i = 0; i < sizeof(scales)/sizeof(scales[0]); ++i )
+    {
+    if( i == 4 )
+        {
+        latitude_formatted[4] = '.';
+        }
+    else
+        {
+        int16_t latdiv = (int16_t)(latitude / scales[i]);
+        latitude_formatted[i] = (char)('0' + latdiv); latitude -= latdiv * scales[i];
+        }
+    }
+latitude_formatted[8]='\0';
+}
+
+static void parse_longitude_into_aprs( uint32_t longitude )
+{
+static const uint32_t scales[]=
+    {
+    1193046471,
+    119304647,
+    11930465,
+    1988411,
+    198842,
+    0,
+    19885,
+    1989
+    };
+
+uint8_t i;
+
+if( longitude >= 0x80000000 )
+    {
+    longitude_formatted[8] = 'W';
+    longitude = 0xffffffff - longitude;
+    }
+else
+    {
+    longitude_formatted[8] = 'E';
+    }
+
+for( i = 0; i < sizeof(scales)/sizeof(scales[0]); ++i )
+    {
+    if( i == 5 )
+        {
+        longitude_formatted[5] = '.';
+        }
+    else
+        {
+        int16_t londiv = (int16_t)(longitude / scales[i]);
+        longitude_formatted[i] = (char)('0' + londiv); longitude -= londiv * scales[i];
+        }
+    }
+longitude_formatted[9]='\0';
+}
+
+static int32_t mm_to_feet( int32_t input )
+{
+//There are 1524 mm in 5 feet
+//There are 381 mm in 1.25 feet
+input /= 4; //Hack off two bits so we have some room
+input *= 5; //This now fits, and represents an overall scaling of 1.25x
+input /= 381;//complete the scaling
+return input;
+}
+
+static void parse_altitude_into_aprs( int32_t altitude )
+{
+altitude = mm_to_feet( altitude );
+if( altitude < 0 )
+    {
+    strcpy( altitude_formatted, "000000");
+    }
+else if( altitude > 999999 )
+    {
+    strcpy( altitude_formatted, "999999" );
+    }
+else
+    {
+    signed char i;
+    for( i = 5; i >= 0; --i )
+        {
+        altitude_formatted[i] = (char)('0' + (int8_t)(altitude % 10)); altitude /= 10;
+        }
+    altitude_formatted[6] = '\0';
+    }
 }
 
 //BELOW HERE ARE GPS-RELATED TASKS
@@ -242,14 +335,40 @@ char* get_dayofmonth()
 /*This task processes GPS fixes*/
 void task_gps_fix( void )
 {
-#define ICD_GPS_200_PI 3.1415926535898f
-#define ICD_GPS_200_RAD2DEG (180.0f/ICD_GPS_200_PI)
-putstr("TaskGpsFix:0x");
-put_hex_u32( *(uint32_t*)&gps_lla_packet[0]);
-putstr(",0x");
-put_hex_u32( *(uint32_t*)&gps_lla_packet[1]);
-putstr("\n");
-//pend_task(TASK_APRS_TX);
+int32_t latitude;
+uint32_t longitude;
+int32_t altitude;
+uint8_t fix_byte = gps_compact_fix_packet[8];
+
+puts("TaskGpsFix:");
+//Check for a fix and make sure it's a 3D one since we need altitude
+if( (fix_byte & ((1<<0)|(1<<2))) == 0 ) 
+	{
+	if( fix_byte & (1<<5) )
+		{
+		puts("\tVelScale=0.02m/s");
+		}
+	else
+		{
+		puts("\tVelScale=0.005m/s");
+		}
+		
+	memcpy( &latitude,  gps_compact_fix_packet+9,  sizeof(latitude) );
+	parse_latitude_into_aprs( latitude );
+	memcpy( &longitude, gps_compact_fix_packet+13, sizeof(longitude) );
+	parse_longitude_into_aprs( longitude );
+	memcpy( &altitude,  gps_compact_fix_packet+17, sizeof(altitude) );
+	parse_altitude_into_aprs( altitude );
+
+	putstr("\tLat:");puts(latitude_formatted);
+	putstr("\tLon:");puts(longitude_formatted);
+	putstr("\tAlt:");puts(altitude_formatted);
+	GPS_ready();
+	}
+else
+	{
+	puts("\tNo fix available");	
+	}
 }
 
 /*this task prints GPS packet IDs for debugging*/

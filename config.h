@@ -36,9 +36,8 @@
 #define DIGI_PATH1      "WIDE2"
 #define DIGI_PATH1_TTL  1
 
-// Transmit the APRS sentence every X milliseconds
-#define APRS_TRANSMIT_PERIOD 60123
-
+// Transmit the APRS sentence no more often than X seconds
+#define APRS_TRANSMIT_PERIOD 60
 
 #endif
 

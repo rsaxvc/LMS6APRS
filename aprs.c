@@ -29,13 +29,6 @@
 //#include "adc.h"
 #include "ax25.h"
 
-
-int32_t meters_to_feet(int32_t m)
-{
-  // 10000 ft = 3048 m
-  return (int32_t)((float)m * 3.2808398950131233595800524934383f);
-}
-
 void aprs_send(void)
 {
   char temp[10];
@@ -61,11 +54,9 @@ void aprs_send(void)
   ax25_send_string(get_timestamp()); 
   ax25_send_byte('z'); // zulu time. h for nonzulu
   //ax25_send_string("4215.37");//get_latitudeTrimmed());     // Lat: 38deg and 22.20 min (.20 are NOT seconds, but 1/100th of minutes)
-  ax25_send_string(get_latitudeTrimmed());     // Lat: 38deg and 22.20 min (.20 are NOT seconds, but 1/100th of minutes)
-  ax25_send_byte('N');
+  ax25_send_string(get_latitudeTrimmed());     // Lat: 38deg and 22.20 min N (.20 are NOT seconds, but 1/100th of minutes)
   ax25_send_byte('/');                // Symbol table
-  ax25_send_string(get_longitudeTrimmed());     // Lon: 000deg and 25.80 min
-  ax25_send_byte('W');
+  ax25_send_string(get_longitudeTrimmed());     // Lon: 000deg and 25.80 min W
   ax25_send_byte('O');                // Symbol: O=balloon, -=QTH
   
   //snprintf(temp, 4, "%03d", (int)(get_course() + 0.5));  
@@ -76,11 +67,7 @@ void aprs_send(void)
   
   ax25_send_string(get_speedKnots());             // speed (knots)
   
-  // TODO: Rework altitude
-  //int32_t alt = 100; // meters_to_feet(strtol(/* get_gpsaltitude()*/ 1337, '\0' /*NULL*/, 10));
-  //char temp[7];
   ax25_send_string("/A=");            // Altitude (feet). Goes anywhere in the comment area
-  //snprintf(temp, 7, "%ld", get_gpsaltitude());
   ax25_send_string(get_gpsaltitude());
 
 

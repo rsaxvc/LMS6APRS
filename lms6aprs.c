@@ -11,6 +11,7 @@
 #include "aprs.h"
 #include "afsk_mod.h"
 #include "cc1050.h"
+#include "config.h"
 #include "asmtools.h"
 #include "tasks.h"
 #include "spilib.h"
@@ -35,19 +36,23 @@ void pend_task_irq( unsigned char new_tasks)
 tasks |= new_tasks;
 }
 
-static void print_portf_registers( void )
+uint8_t gps_counter;
+void GPS_ready( void )
 {
-putstr("PFDDR:");put_hex_u8(PFDDR);putstr("\n");
-putstr("PFOR :");put_hex_u8(PFOR );putstr("\n");
-putstr("PFDR :");put_hex_u8(PFDR );putstr("\n");
+gps_counter++;
+if( gps_counter >= APRS_TRANSMIT_PERIOD )
+	{
+	pend_task( TASK_APRS_TX );
+	gps_counter = 0;
+	}
 }
 
-static const char example_packet[] = { 0x10, 0x01, 'H','E','L','L','O',0,0x10,0x03 };
 
 void main(void)
 	{
 	unsigned char i;
 
+	gps_counter = APRS_TRANSMIT_PERIOD;
 	tasks = 0;
 	port_init();
 	timer_init();
@@ -61,12 +66,6 @@ void main(void)
 //	CC1050_init2( 3957808 );//446.175 on paper - low FSK
 //	CC1050_init2( 3957764 );//446.175 on paper, 446.185 on specan - center
 	CC1050_init2( 3957675 );//446.165 on paper, 446.175 on specan - center
-
-	delay_seconds(1);
-	morse_transmit_word( "KD0LIX" );
-	delay_seconds(1);
-	
-	pend_task(TASK_APRS_TX);
 	
 	for (;;)
 		{
@@ -90,6 +89,11 @@ void main(void)
 		if( new_tasks & TASK_APRS_TX )
 			{
 			task_aprs_tx();
+			}
+		
+		if( new_tasks & TASK_GPS_OVR )
+			{
+			task_gps_ovr();
 			}
 
 		SIM();
