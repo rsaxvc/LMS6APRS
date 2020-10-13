@@ -22,6 +22,8 @@
  * Karlis Goba
  *
  */
+#include "config.h"
+#if MOD_AFSK
 #include <stdint.h>
 #include <stdio.h>
 #if defined(__CSMC__)
@@ -98,8 +100,7 @@ txQuantError = wavetable_space[0];
 
 #if defined(__CSMC__)
 SIM();
-//EICR = 0x10;  //Enable external Interrupt 0, Falling Edge
-EICR = 0x08;  //Enable external Interrupt 0, Rising Edge
+EICR = 0x08;  //Enable external Interrupt 0, Rising Edge. This is actually backwards but the interrupt takes so long it lines up.
 PAOR |= 0x08; //Turn PortA.3 into an interrupt pin
 ITSPR2 = 0xC0;//ei0, the CC1050 modulation interrupt, must be highest to prevent GPS IRQ from causing timing jitter
 RIM();
@@ -179,3 +180,4 @@ else
 	txQuantError = (int8_t)(sample + WAVETABLE_AMPLITUDE);
     }
 }
+#endif

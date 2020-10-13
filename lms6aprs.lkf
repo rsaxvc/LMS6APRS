@@ -16,6 +16,7 @@ aprs.o
 ax25.o
 cc1050.o
 delay.o
+fsk_mod.o
 gps.o
 init.o
 interrupt.o

@@ -19,6 +19,23 @@
  * Ethan Zonca
  *
  */
+ 
+ /* 9600-baud FSK bits from trackuino copyright (C) 2010  EA5HAV Javi
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
 #include "config.h"
 #include "ax25.h"
@@ -108,12 +125,22 @@ void ax25_send_header(const struct s_address *addresses, uint16_t num_addresses)
 	ones_in_a_row = 0;
 	crc = 0xffff;
 	
+#if MOD_AFSK
 	// Send flags during TX_DELAY milliseconds (8 bit-flag = 8000/1200 ms)
 	for (i = 0; i < TX_DELAY * 3 / 20; i++) 
 	{
 		ax25_send_flag();
 	}
-	
+#elif MOD_FSK
+	// Send flags during TX_DELAY milliseconds
+	for (i = 0; i < TX_DELAY * 6 / 5; i++)
+	{
+		ax25_send_flag();
+	}
+#else
+	#error
+#endif
+
 	for (i = 0; i < num_addresses; i++) 
 	{
 		// Transmit callsign
@@ -150,8 +177,54 @@ void ax25_send_footer()
 	ax25_send_flag();
 }
 
-void ax25_flush_frame()
+static uint32_t lfsr;
+
+static uint8_t scramble_bit(uint8_t _in) {
+	uint8_t x = (_in ^ (lfsr >> 16) ^ (lfsr >> 11)) & 1;
+	lfsr = (lfsr << 1) | (x & 1);
+	return x;
+}
+
+/**
+  * Scrambling for FSK
+  */
+static void scramble(void) {
+	uint16_t i;
+	// Scramble
+	lfsr = 0;
+	for(i=0; i<packet_size; i++) {
+		if(scramble_bit((packet[i >> 3] >> (i & 0x7)) & 0x1)) {
+			packet[i>> 3] |= (uint8_t)(1 << (i & 7));
+		} else {
+			packet[i>> 3] &= (uint8_t)~(1 <<(i & 7));
+		}
+	}
+}
+
+//The AFSK modulator does NRZI at the modem.
+//The FSK modulator needs NRZI applied ahead of time
+static void nrzi_encode(void) {
+	uint16_t i;
+	uint8_t ctone = 0;
+	for( i=0; i<packet_size; i++) {
+		if(((packet[i >> 3] >> (i & 0x7)) & 0x1) == 0)
+			ctone = !ctone;
+		if(ctone) {
+			packet[i>> 3] |= (uint8_t)(1 << (i & 7));
+		} else {
+			packet[i>> 3] &= (uint8_t)~(1 <<(i & 7));
+		}
+	}
+}
+
+void ax25_flush_frame(void)
 {
+	#if MOD_FSK
+		scramble();
+		nrzi_encode();
+	#endif
+	putstr("Have ");put_hex_u16(packet_size);puts(" bits");
+	
 	// Key the transmitter and send the frame
 	afsk_send(packet, packet_size);
 }

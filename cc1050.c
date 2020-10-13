@@ -5,6 +5,7 @@
  *	transmits reports over APRS over AX.25
  */
 
+#include "config.h"
 #include "cc1050.h"
 #include "delay.h"
 #include "gpio_def.h"
@@ -142,31 +143,33 @@ CC1050_reg_set( REG_XOSC, 0 );
 CC1050_reg_set( REG_PA_POW, 0 );
 CC1050_reg_set( REG_LOCK, 0x10 );
 CC1050_reg_set( REG_CAL, 0x66 );
-//CC1050_reg_set( REG_MODEM0, 0x13 ); //1200 baud, NRZ, 14.7456MHz xtal
-//CC1050_reg_set( REG_MODEM0, 0x23 ); //2400 baud, NRZ, 14.7456MHz xtal
-//CC1050_reg_set( REG_MODEM0, 0x33 ); //4800 baud, NRZ, 14.7456MHz xtal
-//CC1050_reg_set( REG_MODEM0, 0x43 ); //9600 baud, NRZ, 14.7456MHz xtal
+#if MOD_FSK
+CC1050_reg_set( REG_MODEM0, 0x43 ); //9600 baud, NRZ, 14.7456MHz xtal
+#elif MOD_AFSK
 CC1050_reg_set( REG_MODEM0, 0x53 ); //19200 baud, NRZ, 14.7456MHz xtal
-//CC1050_reg_set( REG_MODEM0, 0x73 ); //76800 baud, NRZ, 14.7456MHz xtal
-//CC1050_reg_set( REG_MODEM0, 0x18 ); //1200 baud, UART, 14.7456MHz xtal
+#endif
 CC1050_reg_set( REG_FSCTRL, 0x1 );
-//CC1050_reg_set( REG_PRESCALER, 0x80 ); //Default
+#if MOD_FSK
+CC1050_reg_set( REG_PRESCALER, 0x80 ); //Default
+#else
 CC1050_reg_set( REG_PRESCALER, 0x60 );
+#endif
 
 CC1050_reg_set( REG_TEST6, 0x10 );
 CC1050_reg_set( REG_TEST5, 0x08 );
 //CC1050_reg_set( REG_TEST4, 0x3F ); //For Baud Rates up to 76800
 //CC1050_reg_set( REG_TEST4, 0x25 ); //For Baud Rates up to 19200
 CC1050_reg_set( REG_TEST4, 0x12 ); //Undocumented but should be lower bandwidth
-//CC1050_reg_set( REG_TEST4, 0x09 ); //Undocumented but should be lower bandwidth
-//CC1050_reg_set( REG_TEST4, 0x05 ); //Undocumented but should be lower bandwidth
-//CC1050_reg_set( REG_TEST4, 0x03 ); //Undocumented but should be lower bandwidth
 CC1050_reg_set( REG_TEST3, 0x04 );
 CC1050_reg_set( REG_TEST2, 0x00 );
 CC1050_reg_set( REG_TEST1, 0x00 );
 CC1050_reg_set( REG_TEST0, 0x00 );
 CC1050_reg_set( REG_FSEP1, 0x00 );
-CC1050_reg_set( REG_FSEP0, 26 ); //Roughly 3kHz deviation
+#if MOD_FSK
+CC1050_reg_set( REG_FSEP0, 60 );
+#elif MOD_AFSK
+CC1050_reg_set( REG_FSEP0, 26 ); //Roughly 3kHz total deviation(+/-1.5kHz)
+#endif
 CC1050_reg_set( REG_PLL,   0x40 );//REFDIV=8
 
 //Initial programming complete

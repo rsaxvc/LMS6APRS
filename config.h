@@ -11,6 +11,10 @@
 // Maximum packet delay
 #define MAX_PACKET_LEN 512  // bytes
 
+//AFSK or FSK. Only one at a time. AFSK does not work well.
+#define MOD_AFSK 0
+#define MOD_FSK  !(MOD_AFSK)
+
 // --------------------------------------------------------------------------
 // APRS config (aprs.c)
 // --------------------------------------------------------------------------
